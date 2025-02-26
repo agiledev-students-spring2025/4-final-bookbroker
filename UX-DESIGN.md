@@ -1,5 +1,10 @@
 # User Experience Design
 
+## Prototype
+A prototype of our app can be viewed on figma via the link below:
+
+[Prototype](https://www.figma.com/proto/mTtO288qBp6ErwVw8rN2Ry/Book-Broker?node-id=45-299&p=f&t=lpWo3sLRg0oVJgaV-1&scaling=scale-down&content-scaling=fixed&page-id=0%3A1&starting-point-node-id=45%3A299)
+
 ## App Map
 ![App Map](./ux-design/App-Map.png)
 
@@ -44,5 +49,3 @@ Listing of newly added books.
 Login page for users.
 
 ![Login](./ux-design/Login.png)
-
-- [prototype instructions](instructions-0b-prototyping.md)
