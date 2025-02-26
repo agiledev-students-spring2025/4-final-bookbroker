@@ -6,3 +6,6 @@ Replace the contents of this file with the completed assignments, as described i
 
 - [app map & wireframe instructions](instructions-0a-app-map-wireframes.md).
 - [prototype instructions](instructions-0b-prototyping.md)
+
+## App Map
+![Site map](./ux-design/appmap.png)
