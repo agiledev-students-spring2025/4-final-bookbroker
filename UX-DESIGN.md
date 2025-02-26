@@ -55,3 +55,7 @@ Replace the contents of this file with the completed assignments, as described i
 ### Profile
 #### Allows users to see their wishlist, book listings, as well as personal information
 ![Profile](./ux-design/profile_wireframe.png)
+
+## Prototype
+
+Check out the interactive **Figma prototype** [here](https://www.figma.com/proto/mTtO288qBp6ErwVw8rN2Ry/Book-Broker?node-id=45-1108&p=f&t=Co9qNqKvBAsvI4ic-1&scaling=scale-down&content-scaling=fixed&page-id=0%3A1&starting-point-node-id=45%3A1108).
