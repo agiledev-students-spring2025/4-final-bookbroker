@@ -1,19 +1,14 @@
-# Project Repository
+# BookBroker
 
-This repository will be used for team projects.
+Bookbroker is an app designed to facilitate trades between people who have books and people who want books, both to foster community and encourage reading in an affordable, sustainable way.
 
-Several sets of instructions are included in this repository. They should each be treated as separate assignments with their own due dates and sets of requirements.
+BookBroker is our final project for our Agile Software Development course at NYU.
 
-1. See the [App Map & Wireframes](instructions-0a-app-map-wireframes.md) and [Prototyping](./instructions-0b-prototyping.md) instructions for the requirements of the initial user experience design of the app.
+[Contributing Guidelines](./CONTRIBUTING.md)
 
-1. Delete the contents of this file and replace with the contents of a proper README.md, as described in the [project setup instructions](./instructions-0c-project-setup.md)
-
-1. See the [Sprint Planning instructions](instructions-0d-sprint-planning.md) for the requirements of Sprint Planning for each Sprint.
-
-1. See the [Front-End Development instructions](./instructions-1-front-end.md) for the requirements of the initial Front-End Development.
-
-1. See the [Back-End Development instructions](./instructions-2-back-end.md) for the requirements of the initial Back-End Development.
-
-1. See the [Database Integration instructions](./instructions-3-database.md) for the requirements of integrating a database into the back-end.
-
-1. See the [Deployment instructions](./instructions-4-deployment.md) for the requirements of deploying an app.
+## Team Members
+- [Isaac](https://github.com/isaac1000000)
+- [Sewon](https://github.com/SewonKim0)
+- [Rainn](https://github.com/Rainn-J)
+- [Shayne](https://github.com/shayne773)
+- [Stephen](https://github.com/StephenS2021)
