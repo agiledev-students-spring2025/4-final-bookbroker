@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import Home from './Home'
 import Feed from './Feed'
 import Browse from './Browse'
@@ -19,21 +19,28 @@ const App = () => {
   return (
     <Router basename={process.env.PUBLIC_URL}>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/feed" element={<Feed />} />
-        <Route path="/browse" element={<Browse />} />
-        <Route path="/browse/newly-added" element={<NewlyAdded />} />
-        <Route path="/browse/popular-now" element={<PopularNow />} />
-        <Route path="/browse/search" element={<Search />} />
-        <Route path="/browse/by-category" element={<ByCategory />} />
-        <Route path="/browse/by-category/:genre" element={<Genre />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/profile/edit" element={<EditProfile />} />
-        <Route path="/profile/my-books" element={<MyBooks />} />
-        <Route path="/profile/my-trades" element={<MyTrades />} />
-        <Route path="/messages" element={<Messages />} />
-        <Route path="/books/:id" element={<BookPage />} />
-        <Route path="/users/:id" element={<UserPage />} />
+        <Route index element={<Navigate to="home" replace />} />
+        <Route path="home" element={<Home />} />
+        <Route path="feed" element={<Feed />} />
+        <Route path="browse" >
+          <Route index element={<Browse />} />
+          <Route path="newly-added" element={<NewlyAdded />} />
+          <Route path="popular" element={<PopularNow />} />
+          <Route path="search" element={<Search />} />
+          <Route path="by-category" >
+            <Route index element={<ByCategory />} />
+            <Route path=":genre" element={<Genre />} />
+          </Route>
+        </Route>
+        <Route path="profile" >
+          <Route index element={<Profile />} />
+          <Route path="edit" element={<EditProfile />} />
+          <Route path="my-books" element={<MyBooks />} />
+          <Route path="my-trades" element={<MyTrades />} />
+        </Route>
+        <Route path="messages" element={<Messages />} />
+        <Route path="books/:id" element={<BookPage />} />
+        <Route path="users/:id" element={<UserPage />} />
       </Routes>
     </Router>
   )
