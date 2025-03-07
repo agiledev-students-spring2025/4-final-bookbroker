@@ -1,0 +1,23 @@
+.login {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.login-form {
+    border: 1px solid black;
+    padding: 1.5rem;
+}
+
+.login-form input {
+    margin-bottom: 1rem;
+}
+
+.login-form label {
+    margin-right: 0.5rem;
+}
+
+.form-button {
+    padding: 0.8rem;
+}
