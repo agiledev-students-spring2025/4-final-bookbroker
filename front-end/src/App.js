@@ -14,6 +14,7 @@ import MyTrades from './Profile/MyTrades'
 import Messages from './Messages'
 import BookPage from './BookPage'
 import UserPage from './UserPage'
+import Login from './Login'
 
 const App = () => {
   return (
@@ -22,6 +23,7 @@ const App = () => {
         <Route index element={<Navigate to="home" replace />} />
         <Route path="home" element={<Home />} />
         <Route path="feed" element={<Feed />} />
+        <Route path="login" element={<Login />} />
         <Route path="browse" >
           <Route index element={<Browse />} />
           <Route path="newly-added" element={<NewlyAdded />} />
