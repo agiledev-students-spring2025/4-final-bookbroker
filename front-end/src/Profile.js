@@ -36,7 +36,10 @@ const Profile = () => {
 
     return (
         <main className="Profile">
-            <h1 class="text-[30px] font-medium">Profile</h1>
+            <div class="flex flex-row items-center">
+                <h1 class="text-[30px] font-medium p-4">Profile</h1>
+                <button class="border-solid border-4 p-1 h-fit">Edit</button>
+            </div>
             <div class="flex flex-row pl-4">
                 <img  src={SAMPLE_PROFILE.profileUrl} alt="Profile Img" class="w-120 bg-gray-500"/>
                 <div class="pl-4">
@@ -48,7 +51,10 @@ const Profile = () => {
             </div>
 
             <div>
-                <h1 class="text-[24px] font-medium mb-4 mt-4 pl-4">Wishlist</h1>
+                <div class="flex flex-row items-center">
+                    <h1 class="text-[24px] font-medium mb-4 mt-4 p-4">Wishlist</h1>
+                    <button class="border-solid border-4 p-1 h-fit">Edit</button>
+                </div>
                 <div class="flex flex-col space-y-4 max-sm:items-center">
                 {SAMPLE_DATA.map((book, index) => (
                     <div key={index} className="Book" class="border-2 border-solid p-4 flex flex-row">
@@ -70,7 +76,10 @@ const Profile = () => {
             </div>
 
             <div>
-                <h1 class="text-[24px] font-medium mb-4 mt-4 pl-4">Your Listings</h1>
+            <div class="flex flex-row items-center">
+                    <h1 class="text-[24px] font-medium mb-4 mt-4 p-4">Your Listings</h1>
+                    <button class="border-solid border-4 p-1 h-fit">Edit</button>
+                </div>
                 <div class="flex flex-col space-y-4 max-sm:items-center">
                 {SAMPLE_DATA.map((book, index) => (
                     <div key={index} className="Book" class="border-2 border-solid p-4 flex flex-row">
