@@ -1,50 +1,21 @@
 import './Search.css'
+import axios from "axios";
+import { useState, useEffect } from "react";
 
 const Search = () => {
-    const SAMPLE_DATA = [
-        {
-            title: "Book Title",
-            year: "Book Year",
-            author: "Book Author",
-            bookUrl: ".",
-            imgUrl: "."
-        },
-        {
-            title: "Book Title",
-            year: "Book Year",
-            author: "Book Author",
-            bookUrl: ".",
-            imgUrl: "."
-        },
-        {
-            title: "Book Title",
-            year: "Book Year",
-            author: "Book Author",
-            bookUrl: ".",
-            imgUrl: "."
-        },
-        {
-            title: "Book Title",
-            year: "Book Year",
-            author: "Book Author",
-            bookUrl: ".",
-            imgUrl: "."
-        },
-        {
-            title: "Book Title",
-            year: "Book Year",
-            author: "Book Author",
-            bookUrl: ".",
-            imgUrl: "."
-        },
-        {
-            title: "Book Title",
-            year: "Book Year",
-            author: "Book Author",
-            bookUrl: ".",
-            imgUrl: "."
+    const [ booksData, setBooksData ] = useState([]);
+    const [ searchQuery, setSearchQuery ] = useState(null);
+
+    useEffect(() => {
+        if (searchQuery === null) {
+            return;
         }
-    ]
+
+        axios
+            .get(`https://my.api.mockaroo.com/books.json?key=${process.env.REACT_APP_MOCK_BOOK_API_KEY_2}`)
+            .then(response => setBooksData(response.data))
+            .catch(err => console.error(err))
+    }, [searchQuery])
 
     return (
         <main className="Search">
@@ -55,14 +26,16 @@ const Search = () => {
             {/* Search Bar */}
             <div className="search-bar">
                 <input type="text" placeholder="Search for books" />
-                <button>
+                <button onClick={() => {
+                    setSearchQuery("");
+                }}>
                     Search
                 </button>
             </div>
 
             {/* Books */}
             <div className="search-books">
-                {SAMPLE_DATA.map((book, index) => (
+                {booksData.map((book, index) => (
                     <div key={index} className="search-book">
                         <img src={book.imgUrl} alt="Book Cover" />
                         

@@ -1,50 +1,16 @@
 import './Feed.css'
+import axios from "axios";
+import { useState, useEffect } from "react";
 
 const Feed = () => {
-    const SAMPLE_DATA = [
-        {
-            title: "Book Title",
-            year: "Book Year",
-            author: "Book Author",
-            bookUrl: ".",
-            imgUrl: "."
-        },
-        {
-            title: "Book Title",
-            year: "Book Year",
-            author: "Book Author",
-            bookUrl: ".",
-            imgUrl: "."
-        },
-        {
-            title: "Book Title",
-            year: "Book Year",
-            author: "Book Author",
-            bookUrl: ".",
-            imgUrl: "."
-        },
-        {
-            title: "Book Title",
-            year: "Book Year",
-            author: "Book Author",
-            bookUrl: ".",
-            imgUrl: "."
-        },
-        {
-            title: "Book Title",
-            year: "Book Year",
-            author: "Book Author",
-            bookUrl: ".",
-            imgUrl: "."
-        },
-        {
-            title: "Book Title",
-            year: "Book Year",
-            author: "Book Author",
-            bookUrl: ".",
-            imgUrl: "."
-        }
-    ]
+    const [ booksData, setBooksData ] = useState([]);
+
+    useEffect(() => {
+        axios
+            .get(`https://my.api.mockaroo.com/books.json?key=${process.env.REACT_APP_MOCK_BOOK_API_KEY_2}`)
+            .then(response => setBooksData(response.data))
+            .catch(err => console.error(err))
+    }, [])
 
     return (
         <main className="Feed">
@@ -54,7 +20,7 @@ const Feed = () => {
 
             {/* Books */}
             <div className="feed-books">
-                {SAMPLE_DATA.map((book, index) => (
+                {booksData.map((book, index) => (
                     <div key={index} className="feed-book">
                         <img src={book.imgUrl} alt="Book Cover" />
                         
