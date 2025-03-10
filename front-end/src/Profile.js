@@ -1,9 +1,38 @@
-import './Profile.css';
-
-
-//***all data are placeholders and should be replaced by dynamic data from db***
+import './Profile.css'
 
 const Profile = () => {
+    const SAMPLE_PROFILE = {
+        username: 'username',
+        email: 'example@email.com',
+        location: 'location',
+        ratings: 'ratings',
+        profileUrl: '.',
+
+    }
+    const SAMPLE_DATA = [
+        {
+            title: "Book Title",
+            year: "Book Year",
+            author: "Book Author",
+            bookUrl: ".",
+            imgUrl: "."
+        },
+        {
+            title: "Book Title",
+            year: "Book Year",
+            author: "Book Author",
+            bookUrl: ".",
+            imgUrl: "."
+        },
+        {
+            title: "Book Title",
+            year: "Book Year",
+            author: "Book Author",
+            bookUrl: ".",
+            imgUrl: "."
+        }
+    ]
+
     return (
         <main className="profile">
             <h1 className="title">Profile</h1>
