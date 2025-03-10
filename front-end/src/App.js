@@ -15,6 +15,7 @@ import Messages from './Messages'
 import BookPage from './BookPage'
 import UserPage from './UserPage'
 import Login from './Login'
+import Navbar from './Navbar';
 
 const App = () => {
   return (
@@ -44,7 +45,9 @@ const App = () => {
         <Route path="books/:id" element={<BookPage />} />
         <Route path="users/:id" element={<UserPage />} />
       </Routes>
+      <Navbar/>
     </Router>
+
   )
 }
 

@@ -1,0 +1,11 @@
+nav {
+    text-align: center;
+    background-color: rgb(97, 46, 7);
+    padding: 30px;
+}
+
+.nav-item {
+    font-size: 20px;
+    margin: 60px;
+    text-decoration: none;
+}
