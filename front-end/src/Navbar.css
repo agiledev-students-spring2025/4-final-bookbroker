@@ -1,11 +1,14 @@
 nav {
     text-align: center;
     background-color: rgb(97, 46, 7);
-    padding: 30px;
+    display: flex;
+    padding-top: 20px;
+    padding-bottom: 20px;
 }
 
 .nav-item {
-    font-size: 20px;
-    margin: 60px;
+    display: flex;
+    font-size: auto;
+    margin: auto;
     text-decoration: none;
 }
