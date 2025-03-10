@@ -1,37 +1,6 @@
 import './Profile.css'
 
 const Profile = () => {
-    const SAMPLE_PROFILE = {
-        username: 'username',
-        email: 'example@email.com',
-        location: 'location',
-        ratings: 'ratings',
-        profileUrl: '.',
-
-    }
-    const SAMPLE_DATA = [
-        {
-            title: "Book Title",
-            year: "Book Year",
-            author: "Book Author",
-            bookUrl: ".",
-            imgUrl: "."
-        },
-        {
-            title: "Book Title",
-            year: "Book Year",
-            author: "Book Author",
-            bookUrl: ".",
-            imgUrl: "."
-        },
-        {
-            title: "Book Title",
-            year: "Book Year",
-            author: "Book Author",
-            bookUrl: ".",
-            imgUrl: "."
-        }
-    ]
 
     return (
         <main className="profile">
