@@ -1,9 +1,30 @@
 import './ByCategory.css'
 import { useNavigate } from "react-router-dom";
+import axios from 'axios'
+import { useEffect, useState } from 'react'
 
 const ByCategory = () => {
     const navigate = useNavigate();
-    const genres = ["Fiction", "Nonfiction"];
+    const [genres, setGenres] = useState([]);
+
+
+    useEffect(() => {
+        axios
+            .get(`https://my.api.mockaroo.com/books.json?key=${process.env.REACT_APP_MOCK_BOOK_API_KEY_3}`)
+            .then(response =>  {
+                console.log("API Response:", response.data);
+                if (Array.isArray(response.data)) {
+                const uniqueGenres = [...new Set(response.data.map(book => book.genre?.toLowerCase()))]
+                        console.log("Extracted Genres:", uniqueGenres); 
+                    setGenres(uniqueGenres);
+            } else {
+                console.error("API did not return an array:", response.data);
+                setGenres([]);
+            }
+        })
+            .catch(err => console.error(err))
+    }, []);
+
 
     return (
         <main className="ByCategory">
@@ -14,7 +35,7 @@ const ByCategory = () => {
                 {genres.map((genre, index) => (
                 <li key={index}>
                     <button onClick={() => navigate(`/browse/by-category/${genre.toLowerCase()}`)} className="category-btn">
-                    {genre}
+                    {genre.charAt(0).toUpperCase() + genre.slice(1)}
                     </button>
                 </li>
                 ))}
