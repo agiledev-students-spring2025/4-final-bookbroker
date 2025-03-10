@@ -15,7 +15,16 @@
 
     display: flex;
     align-items: center;
-    justify-content: space-evenly;
+    justify-content: space-between;
+}
+
+.feed-book > img {
+    width: 35%;
+}
+
+.feed-book-text {
+    margin-left: 0.8rem;
+    margin-right: 0.8rem;
 }
 
 .feed-book-text > h2, .feed-book-text > p {

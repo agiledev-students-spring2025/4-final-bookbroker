@@ -15,7 +15,12 @@
 
     display: flex;
     align-items: center;
-    justify-content: space-evenly;
+    justify-content: space-between;
+}
+
+.search-book-text {
+    margin-left: 0.8rem;
+    margin-right: 0.8rem;
 }
 
 .search-book-text > h2, .search-book-text > p {
@@ -44,4 +49,8 @@
     width: max-content;
     border: 1px solid black;
     margin-left: 0.8rem;
+}
+
+.search-book > img {
+    width: 35%;
 }
