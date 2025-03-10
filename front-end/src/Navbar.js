@@ -4,26 +4,21 @@ import { FaHome, FaSearch, FaEnvelope, FaUser, FaBook } from 'react-icons/fa';
 
 const Navbar = () => {
   return (
-    <nav className="navbar">
+    <nav className="navbar fixed -bottom-0 w-full h-12 flex justify-evenly content-center bg-brown">
       <NavLink to="/home" className="nav-item">
-        <FaHome className="nav-icon" />
-        <span>Home</span>
+        <FaHome className="nav-icon w-8 h-8 my-2" />
       </NavLink>
       <NavLink to="/browse" className="nav-item">
-        <FaSearch className="nav-icon" />
-        <span>Browse</span>
+        <FaSearch className="nav-icon w-8 h-8 my-2" />
       </NavLink>
       <NavLink to="/feed" className="nav-item">
-        <FaBook className="nav-icon" />
-        <span>Feed</span>
+        <FaBook className="nav-icon w-8 h-8 my-2" />
       </NavLink>
       <NavLink to="/messages" className="nav-item">
-        <FaEnvelope className="nav-icon" />
-        <span>Messages</span>
+        <FaEnvelope className="nav-icon w-8 h-8 my-2" />
       </NavLink>
       <NavLink to="/profile" className="nav-item">
-        <FaUser className="nav-icon" />
-        <span>Profile</span>
+        <FaUser className="nav-icon w-8 h-8 my-2" />
       </NavLink>
     </nav>
   );
