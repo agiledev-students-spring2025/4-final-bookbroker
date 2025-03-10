@@ -1,62 +1,27 @@
 import './Genre.css'
 import { useParams } from 'react-router-dom'
 import { Link, useNavigate } from 'react-router-dom'
+import axios from 'axios'
+import { useEffect, useState } from 'react'
 
 const Genre = () => {
     const navigate = useNavigate();
     const { genre } = useParams()
-    const books=[
-        {
-            title: "Book Title",
-            year: "Book Year",
-            author: "Book Author",
-            genre: "fiction",
-            bookUrl: ".",
-            imgUrl: "."
-        },
-        {
-            title: "Book Title",
-            year: "Book Year",
-            author: "Book Author",
-            genre: "fiction",
-            bookUrl: ".",
-            imgUrl: "."
-        },
-        {
-            title: "Book Title",
-            year: "Book Year",
-            author: "Book Author",
-            genre: "nonfiction",
-            bookUrl: ".",
-            imgUrl: "."
-        },
-        {
-            title: "Book Title",
-            year: "Book Year",
-            author: "Book Author",
-            genre: "fiction",
-            bookUrl: ".",
-            imgUrl: "."
-        },
-        {
-            title: "Book Title",
-            year: "Book Year",
-            author: "Book Author",
-            genre: "nonfiction",
-            bookUrl: ".",
-            imgUrl: "."
-        },
-        {
-            title: "Book Title",
-            year: "Book Year",
-            author: "Book Author",
-            genre: "fiction",
-            bookUrl: ".",
-            imgUrl: "."
-        }
-    ]
+    const [books, setBooks] = useState([])
 
-    const filteredBooks = books.filter((book) => book.genre === genre.toLowerCase());
+    useEffect(() => {
+        axios
+            .get(`https://my.api.mockaroo.com/books.json?key=${process.env.REACT_APP_MOCK_BOOK_API_KEY_3}`)
+            .then(response => {
+                console.log("API Response:", response.data);
+                    setBooks(response.data)
+                })
+            .catch(err => console.error(err))
+    }, [genre])
+
+    
+
+    const filteredBooks = books.filter((book) => book.genre?.toLowerCase() === genre.toLowerCase());
     
     return (
         <main className="Genre">
@@ -76,9 +41,9 @@ const Genre = () => {
 
                     {/* Book Details */}
                     <div className="book-info">
-                        <p className="book-title">{book.title}</p>
-                        <p className="book-year">{book.year}</p>
-                        <p className="book-author">{book.author}</p>
+                        <p className="book-title">{book.title ? book.title : "[NO TITLE]"}</p>
+                        <p className="book-year">{book.year ? book.year : "[NO DATE]"}</p>
+                        <p className="book-author">{book.author ? book.author : "[NO AUTHOR]"}</p>
                     </div>
 
                     {/* Show Interest Button */}
