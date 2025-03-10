@@ -1,0 +1,47 @@
+.Search {
+    padding: 1.2rem;
+}
+
+.search-title {
+    margin: 0;
+    margin-bottom: 1.5rem;
+    font-size: 2.6rem;
+    font-weight: normal;
+}
+
+.search-book {
+    border: 1px solid black;
+    padding: 0.7rem;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
+.search-book-text > h2, .search-book-text > p {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.search-book-button > button {
+    padding: 0.5rem;
+    font-size: 1.1rem;
+    width: min-content;
+}
+
+.search-bar {
+    margin-bottom: 0.8rem;
+}
+
+.search-bar > input {
+    border: 1px solid black;
+    padding: 0.3rem;
+}
+
+.search-bar > button {
+    padding: 0.4rem;
+    font-size: 1.1rem;
+    width: max-content;
+    border: 1px solid black;
+    margin-left: 0.8rem;
+}
