@@ -1,28 +1,38 @@
 import './Genre.css'
 import { useParams } from 'react-router-dom'
 import { Link, useNavigate } from 'react-router-dom'
-import axios from 'axios'
+import { generateBooks, getBookImage } from '../../MockData.js'
 import { useEffect, useState } from 'react'
+
+/* 
+Commenting until server is running
+
+import axios from 'axios' Until server 
+*/
 
 const Genre = () => {
     const navigate = useNavigate();
     const { genre } = useParams()
+
     const [books, setBooks] = useState([])
 
     useEffect(() => {
+    /*
+    Commenting until server is running
+
         axios
-            .get(`https://my.api.mockaroo.com/books.json?key=${process.env.REACT_APP_MOCK_BOOK_API_KEY_3}`)
+            .get(`${process.env.REACT_APP_SERVER_ADDRESS}?genre=${genre}`)
             .then(response => {
                 console.log("API Response:", response.data);
                     setBooks(response.data)
                 })
             .catch(err => console.error(err))
+    */
+
+        setBooks(generateBooks(250).filter((book) => book.genre?.toLowerCase() === genre.toLowerCase()))
     }, [genre])
 
-    
 
-    const filteredBooks = books.filter((book) => book.genre?.toLowerCase() === genre.toLowerCase());
-    
     return (
         <main className="Genre">
             <div className="titlebox">
@@ -31,12 +41,12 @@ const Genre = () => {
                 </h1>
             </div>
             <div className="book-list">
-                {filteredBooks.length > 0 ? (
-                filteredBooks.map((book, index) => (
+                {books.length > 0 ? (
+                books.map((book, index) => (
                     <div key={book.id} className="book-item">
                     {/* Book Image */}
                     <Link to={`/books/${book.id}`}>
-                        <img src={`https://picsum.photos/80/100?random=${index}`} alt="Book Cover" className="book-image" />
+                        <img src={getBookImage(book.id)} alt="Book Cover" className="book-image" />
                     </Link>
 
                     {/* Book Details */}
