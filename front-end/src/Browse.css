@@ -11,21 +11,19 @@
   /* Title */
   .titlebox {
     display: flex;
-    flex-direction: column;
     align-items: center;
+    flex-direction: column;
     width: 100%;
     background: #38261e;
     margin-top: 0;
-    margin-bottom: auto;
+
   }
   .title {
-    text-align: left;
     width: 100%;
     font-size: 2.5rem;
     font-weight: bold;
     color: #ff9700;
-    margin-bottom: auto;
-    margin: 20px;
+    margin: 0;
   }
   
   /* Category Buttons */
@@ -33,7 +31,8 @@
     display: flex;
     flex-direction: column;
     width: 80%;
-    margin-top: 20px;
+    margin-top: auto;
+    margin-bottom: auto;
   }
   
   .category-btn {
@@ -53,30 +52,4 @@
     background: #fceacf;
   }
   
-  /* Underline effect for text */
-  .underline {
-    text-decoration: underline;
-  }
-  
-  /* Bottom Navigation Bar */
-  .bottom-nav {
-    margin-top: auto;
-    width: 100%;
-    background: #38261e;
-    padding: 10px 0;
-    display: flex;
-    justify-content: space-around;
-  }
-  
-  .nav-item {
-    color: #ff9700;
-    font-size: 1rem;
-    background: none;
-    border: none;
-    cursor: pointer;
-    transition: color 0.3s ease;
-  }
-  
-  .nav-item:hover {
-    color: #fceacf; 
-  }
+ 
