@@ -8,7 +8,7 @@ import axios from 'axios'
 import { getBook, getBookImage } from './MockData.js';
 
 const BookPage = () => {
-    const id = Number(useParams().id)
+    const { id } = useParams()
 
     const [book, setBook] = useState({})
 
@@ -20,8 +20,9 @@ const BookPage = () => {
             .then(response => setBook(response.data))
             .catch(err => console.error(err))
     */
+
         setBook(getBook(id))
-    },  [book, id])
+    }, []) // Empty dependency array triggers only on page load (zzz was such a headache)
 
     const bookImageSource = getBookImage(id)
 
