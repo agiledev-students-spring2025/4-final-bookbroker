@@ -1,15 +1,21 @@
 import './Feed.css'
-import axios from "axios";
+// import axios from "axios"; commented out until server is ready
 import { useState, useEffect } from "react";
+import { generateBooks, getBookImage } from './MockData.js'
 
 const Feed = () => {
     const [ booksData, setBooksData ] = useState([]);
 
     useEffect(() => {
+        /*
+        Commented out until server is ready
         axios
-            .get(`https://my.api.mockaroo.com/books.json?key=${process.env.REACT_APP_MOCK_BOOK_API_KEY_2}`)
+            .get(`${process.env.REACT_APP_SERVER_ADDRESS}`)
             .then(response => setBooksData(response.data))
             .catch(err => console.error(err))
+        */
+    
+        setBooksData(generateBooks(20))
     }, [])
 
     return (
@@ -22,7 +28,7 @@ const Feed = () => {
             <div className="feed-books">
                 {booksData.map((book, index) => (
                     <div key={index} className="feed-book">
-                        <img src={book.imgUrl} alt="Book Cover" />
+                        <img src={getBookImage(book.id)} alt="Book Cover" />
                         
                         <div className="feed-book-text">
                             <h2>{book.title}</h2>
@@ -30,7 +36,7 @@ const Feed = () => {
                             <p>{book.author}</p>
                         </div>
 
-                        <a href={book.bookUrl} className="feed-book-button">
+                        <a href={"/books/" + book.id} className="feed-book-button">
                             <button>
                                 Show Interest
                             </button>
