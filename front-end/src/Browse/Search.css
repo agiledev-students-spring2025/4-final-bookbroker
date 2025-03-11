@@ -1,7 +1,5 @@
 .Search {
     padding: 1.2rem;
-    background-color: #eadbd6;
-    min-height: 100vh;
 }
 
 .search-title {
@@ -12,7 +10,6 @@
 }
 
 .search-book {
-    background-color: white;
     border: 1px solid black;
     padding: 0.7rem;
 
@@ -56,8 +53,4 @@
 
 .search-book > img {
     width: 35%;
-}
-
-.search-books {
-    margin-bottom: 5rem;
 }
