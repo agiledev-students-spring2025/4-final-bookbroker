@@ -1,7 +1,9 @@
 import { faker } from '@faker-js/faker';
 
+const SEED_CAP = 2500000
+
 function generateBook() {
-        const id = Math.floor(Math.random() * 2500000)+1
+        const id = Math.floor(Math.random() * SEED_CAP)+1
 
         const book = getBook(id)
 
@@ -53,4 +55,27 @@ function getGenres(n) {
     return genres
 }
 
-export { generateBook, getBook, generateBooks, getBookImage, getGenres }
+function generateUser() {
+    const id = Math.floor(Math.random() * SEED_CAP)+1
+
+    const user = getUser(id)
+
+    return user
+
+}
+
+function getUser(id) {
+    faker.seed(id)
+
+    const user = {
+        id: id,
+        username: faker.internet.username(),
+        email: faker.internet.email(),
+        location: faker.location.city(),
+        ratings: faker.number.float({min: 0, max: 5, fractionDigits: 1})
+    }
+
+    return user
+}
+
+export { generateBook, getBook, generateBooks, getBookImage, getGenres, getUser, generateUser }
