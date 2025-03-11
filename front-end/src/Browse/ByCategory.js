@@ -1,7 +1,8 @@
 import './ByCategory.css'
 import { useNavigate } from "react-router-dom";
-import axios from 'axios'
+// import axios from 'axios' Commenting until server is ready
 import { useEffect, useState } from 'react'
+import { getGenres } from '../MockData.js'
 
 const ByCategory = () => {
     const navigate = useNavigate();
@@ -9,6 +10,9 @@ const ByCategory = () => {
 
 
     useEffect(() => {
+        /*
+        Commenting until server is ready
+
         axios
             .get(`https://my.api.mockaroo.com/books.json?key=${process.env.REACT_APP_MOCK_BOOK_API_KEY_3}`)
             .then(response =>  {
@@ -23,6 +27,9 @@ const ByCategory = () => {
             }
         })
             .catch(err => console.error(err))
+    */
+
+    setGenres(getGenres(15))
     }, []);
 
 
