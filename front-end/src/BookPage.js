@@ -21,7 +21,7 @@ const BookPage = () => {
             .catch(err => console.error(err))
     */
 
-        setBook(getBook(id))
+        setBook(getBook(Number(id)))
     }, []) // Empty dependency array triggers only on page load (zzz was such a headache)
 
     const bookImageSource = getBookImage(id)
