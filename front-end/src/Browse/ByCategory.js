@@ -41,11 +41,6 @@ const ByCategory = () => {
                 ))}
             </ul>
 
-            <div className="bottom-nav">
-                {["Home", "Browse", "Feed", "Messages", "Profile"].map((tab, index) => (
-                <button key={index} onClick={() => navigate(`/${tab.toLowerCase()}`)}  className="nav-item">{tab}</button>
-                ))}
-            </div>
         </main>
     )
 }
