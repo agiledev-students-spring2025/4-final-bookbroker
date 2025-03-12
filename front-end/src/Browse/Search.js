@@ -1,12 +1,16 @@
 import './Search.css'
-import axios from "axios";
+// import axios from "axios"; Commenting until server is ready
 import { useState, useEffect } from "react";
+import { generateBooks, getBookImage } from '../MockData.js'
 
 const Search = () => {
     const [ booksData, setBooksData ] = useState([]);
     const [ searchQuery, setSearchQuery ] = useState(null);
 
     useEffect(() => {
+    /*
+    Commenting until server is ready
+
         if (searchQuery === null) {
             return;
         }
@@ -15,6 +19,9 @@ const Search = () => {
             .get(`https://my.api.mockaroo.com/books.json?key=${process.env.REACT_APP_MOCK_BOOK_API_KEY_2}`)
             .then(response => setBooksData(response.data))
             .catch(err => console.error(err))
+    */
+
+        setBooksData(generateBooks(25))
     }, [searchQuery])
 
     return (
@@ -37,7 +44,7 @@ const Search = () => {
             <div className="search-books">
                 {booksData.map((book, index) => (
                     <div key={index} className="search-book">
-                        <img src={book.imgUrl} alt="Book Cover" />
+                        <img src={getBookImage(book.id)} alt="Book Cover" />
                         
                         <div className="search-book-text">
                             <h2>{book.title}</h2>
@@ -45,7 +52,7 @@ const Search = () => {
                             <p>{book.author}</p>
                         </div>
 
-                        <a href={book.bookUrl} className="search-book-button">
+                        <a href={"/books/" + book.id} className="search-book-button">
                             <button>
                                 Show Interest
                             </button>

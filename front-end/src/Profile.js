@@ -1,6 +1,7 @@
 import './Profile.css';
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+// import axios from 'axios'; Commenting out until server is ready
+import { generateUser, generateBooks } from './MockData.js'
 
 const Profile = () => {
     const [user, setUser] = useState({});
@@ -9,9 +10,12 @@ const Profile = () => {
 
     // Fetch User Data
     useEffect(() => {
+        /*
+        Commenting out until server is ready
+
         const fetchUser = async () => {
             try {
-                const response = await axios.get(`https://my.api.mockaroo.com/users.json?key=${process.env.REACT_APP_MOCK_USER_API_KEY}`);
+                const response = await axios.get(`process.env.REACT_APP_SERVER_ADDRESS?user=${userid}`);
                 setUser(response.data[0]);
             } catch (error) {
                 console.error('Error fetching user data:', error);
@@ -19,10 +23,16 @@ const Profile = () => {
         };
 
         fetchUser();
+        */
+
+        setUser(generateUser())
     }, []);
 
     // Fetch Books Data
     useEffect(() => {
+        /*
+        Commenting out until server is ready
+
         const fetchBooks = async () => {
             try {
                 const response = await axios.get(`https://my.api.mockaroo.com/books.json?key=${process.env.REACT_APP_MOCK_BOOK_API_KEY_2}`);
@@ -39,6 +49,10 @@ const Profile = () => {
         };
 
         fetchBooks();
+        */
+
+        setWishlistBooks(generateBooks(4))
+        setOfferedBooks(generateBooks(4))
     }, []);
 
     return (
