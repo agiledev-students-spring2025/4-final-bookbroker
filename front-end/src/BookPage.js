@@ -1,20 +1,30 @@
 import './BookPage.css'
 import { useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
+/*
+Commented out until server is ready
 import axios from 'axios'
+*/
+import { getBook, getBookImage } from './MockData.js';
 
 const BookPage = () => {
     const { id } = useParams()
+
     const [book, setBook] = useState({})
 
     useEffect(() => {
+    /*
+    Commented out until server is ready
         axios
-            .get(`https://my.api.mockaroo.com/book?id=${id}&key=${process.env.REACT_APP_MOCK_BOOK_API_KEY}`)
+            .get(`${process.env.REACT_APP_SERVER_ADDRESS}?id=${id}`)
             .then(response => setBook(response.data))
             .catch(err => console.error(err))
-    }, [book, id])
+    */
 
-    const bookImageSource = process.env.REACT_APP_MOCK_IMG_SRC
+        setBook(getBook(Number(id)))
+    }, []) // Empty dependency array triggers only on page load (zzz was such a headache)
+
+    const bookImageSource = getBookImage(id)
 
     return (
         <main className="BookPage content-center mt-10">

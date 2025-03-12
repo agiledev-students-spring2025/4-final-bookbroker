@@ -21,18 +21,12 @@ const Browse = () => {
             <div className="category-list">
                 {["Popular Now", "Newly Added", "By Category", "Search"].map((item, index) => (
                     <button key={index} onClick={() => navigate(routes[item])} className="category-btn">
-                    <span className="underline">{item}</span>
+                    {item}
                     </button>
                 ))}
             </div>
-            
-            {/*
-            <div className="bottom-nav">
-                {["Home", "Browse", "Feed", "Messages", "Profile"].map((tab, index) => (
-                <button key={index} onClick={() => navigate(`/${tab.toLowerCase()}`)}  className="nav-item">{tab}</button>
-                ))}
-            </div>
-            */}
+
+        
         </main>
     )
 }
