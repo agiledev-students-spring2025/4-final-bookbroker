@@ -71,6 +71,8 @@ function getUser(id) {
         id: id,
         username: faker.internet.username(),
         email: faker.internet.email(),
+        trades: faker.number.int({min: 0, max:1500}),
+        recentTrade: getBook(id),
         location: faker.location.city(),
         ratings: faker.number.float({min: 0, max: 5, fractionDigits: 1})
     }
