@@ -4,11 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { generateBooks, getBookImage } from '../../MockData.js'
 import { useEffect, useState } from 'react'
 
-/* 
-Commenting until server is running
 
-import axios from 'axios' Until server 
-*/
 
 const Genre = () => {
     const navigate = useNavigate();
@@ -16,21 +12,18 @@ const Genre = () => {
 
     const [books, setBooks] = useState([])
 
+
     useEffect(() => {
-    /*
-    Commenting until server is running
-
-        axios
-            .get(`${process.env.REACT_APP_SERVER_ADDRESS}?genre=${genre}`)
-            .then(response => {
-                console.log("API Response:", response.data);
-                    setBooks(response.data)
+            fetch(`http://localhost:3000/books?genre=${encodeURIComponent(genre)}`)
+                .then(res => res.json())
+                .then(data => {
+                    setBooks(data);
                 })
-            .catch(err => console.error(err))
-    */
-
-        setBooks(generateBooks(250).filter((book) => book.genre?.toLowerCase() === genre.toLowerCase()))
-    }, [genre])
+                .catch(err => {
+                    console.error("Failed to fetch books:", err);
+                    setBooks([]);
+                });
+    }, [genre]);
 
 
     return (
