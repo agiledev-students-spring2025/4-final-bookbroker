@@ -1,5 +1,5 @@
 import './Feed.css'
-// import axios from "axios"; commented out until server is ready
+
 import { useState, useEffect } from "react";
 import { generateBooks, getBookImage } from './MockData.js'
 
@@ -7,16 +7,15 @@ const Feed = () => {
     const [ booksData, setBooksData ] = useState([]);
 
     useEffect(() => {
-        /*
-        Commented out until server is ready
-        axios
-            .get(`${process.env.REACT_APP_SERVER_ADDRESS}`)
-            .then(response => setBooksData(response.data))
-            .catch(err => console.error(err))
-        */
-    
-        setBooksData(generateBooks(20))
-    }, [])
+        fetch('http://localhost:3000/feed')
+        .then(res => res.json())
+        .then(data => setBooksData(data))
+        .catch(err => {
+            console.error('Failed to fetch feed books:', err);
+            setBooksData([]);
+        });
+}, []);
+
 
     return (
         <main className="Feed">

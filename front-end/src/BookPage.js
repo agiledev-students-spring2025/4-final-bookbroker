@@ -1,10 +1,7 @@
 import './BookPage.css'
 import { useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-/*
-Commented out until server is ready
-import axios from 'axios'
-*/
+
 import { getBook, getBookImage } from './MockData.js';
 
 const BookPage = () => {
@@ -13,16 +10,14 @@ const BookPage = () => {
     const [book, setBook] = useState({})
 
     useEffect(() => {
-    /*
-    Commented out until server is ready
-        axios
-            .get(`${process.env.REACT_APP_SERVER_ADDRESS}?id=${id}`)
-            .then(response => setBook(response.data))
-            .catch(err => console.error(err))
-    */
-
-        setBook(getBook(Number(id)))
-    }, []) // Empty dependency array triggers only on page load (zzz was such a headache)
+        fetch(`http://localhost:3000/books/${id}`)
+        .then(res => res.json())
+        .then(data => setBook(data))
+        .catch(err => {
+            console.error('Failed to fetch book:', err);
+            setBook({});
+        });
+}, []); // Empty dependency array triggers only on page load (zzz was such a headache)
 
     const bookImageSource = getBookImage(id)
 
