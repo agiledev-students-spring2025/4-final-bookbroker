@@ -14,7 +14,7 @@ const Genre = () => {
 
 
     useEffect(() => {
-            fetch(`http://localhost:3000/books?genre=${encodeURIComponent(genre)}`)
+            fetch(`http://localhost:5000/books?genre=${encodeURIComponent(genre)}`)
                 .then(res => res.json())
                 .then(data => {
                     setBooks(data);

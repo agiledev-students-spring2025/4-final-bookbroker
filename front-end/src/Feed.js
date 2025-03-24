@@ -7,9 +7,9 @@ const Feed = () => {
     const [ booksData, setBooksData ] = useState([]);
 
     useEffect(() => {
-        fetch('http://localhost:3000/feed')
+        fetch('http://localhost:5000/feed')
         .then(res => res.json())
-        .then(data => setBooksData(data))
+        .then(data => console.log(data) || setBooksData(data))
         .catch(err => {
             console.error('Failed to fetch feed books:', err);
             setBooksData([]);
@@ -30,9 +30,9 @@ const Feed = () => {
                         <img src={getBookImage(book.id)} alt="Book Cover" />
                         
                         <div className="feed-book-text">
-                            <h2>{book.title}</h2>
-                            <p>{book.year}</p>
-                            <p>{book.author}</p>
+                            <h2>{book.title ? book.title : "[NO TITLE]"}</h2>
+                            <p>{book.year ? book.year : "[NO YEAR]"}</p>
+                            <p>{book.author ? book.author : "[NO AUTHOR]"}</p>
                         </div>
 
                         <a href={"/books/" + book.id} className="feed-book-button">

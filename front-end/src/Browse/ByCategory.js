@@ -9,7 +9,7 @@ const ByCategory = () => {
 
 
     useEffect(() => {
-        fetch('http://localhost:3000/genres') 
+        fetch('http://localhost:5000/genres') 
         .then((res) => res.json())
         .then((data) => {
             setGenres(data);
