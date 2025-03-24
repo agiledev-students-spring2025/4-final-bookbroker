@@ -36,7 +36,7 @@ const Feed = () => {
                         </div>
 
                         <a href={"/books/" + book.id} className="feed-book-button">
-                            <button>
+                            <button className="interest-btn">
                                 Show Interest
                             </button>
                         </a>
