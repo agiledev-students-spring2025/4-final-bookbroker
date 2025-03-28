@@ -1,12 +1,28 @@
 import './Profile.css';
 import { useState, useEffect } from 'react';
-// import axios from 'axios'; Commenting out until server is ready
+// import axios from 'axios'; Commenting out until server i
+// s ready
 import { generateUser, generateBooks } from './MockData.js'
+import { FaMapMarkerAlt, FaEnvelope, FaStar, FaBookOpen, FaPlus, FaAngleRight} from 'react-icons/fa';
+
 
 const Profile = () => {
     const [user, setUser] = useState({});
     const [wishlistBooks, setWishlistBooks] = useState([]);
     const [offeredBooks, setOfferedBooks] = useState([]);
+    const [fadeInClass, setFadeInClass] = useState({
+        profile: 'fade-start',
+        wishlist: 'fade-start',
+        offerings: 'fade-start'
+    });
+    
+    //animation when clicking on the page
+    useEffect(() => {
+        // staggered fade-in
+        setTimeout(() => setFadeInClass(prev => ({ ...prev, profile: 'fade-in' })), 200);
+        setTimeout(() => setFadeInClass(prev => ({ ...prev, wishlist: 'fade-in' })), 300);
+        setTimeout(() => setFadeInClass(prev => ({ ...prev, offerings: 'fade-in' })), 500);
+    }, []);
 
     // Fetch User Data
     useEffect(() => {
@@ -56,27 +72,60 @@ const Profile = () => {
     }, []);
 
     return (
-        <main className="profile">
+        <div>
+        <div className="titlebox">
             <h1 className="title">Profile</h1>
-            <div className="infoContainer">
-                <img className="profilePhoto" src="https://www.gravatar.com/avatar/2c7d99fe281ecd3bcd65ab915bac6dd5?s=250" alt="Profile" />
+        </div>
+        <main className={"profile"}>
+
+            {/*profile info section*/}
+            
+            <div className={`infoContainer  ${fadeInClass.profile}`}>
+                <div className="photoAndButton">
+                    <img className="profilePhoto" src="https://www.gravatar.com/avatar/2c7d99fe281ecd3bcd65ab915bac6dd5?s=250" alt="Profile" />
+                    <button className="editProfileBtn">Edit Profile</button>
+                </div>
                 <ul className="infoList">
-                    <li><strong>Username:</strong> {user.username} </li>
-                    <li><strong>Email:</strong> {user.email} </li>
-                    <li><strong>Location:</strong> {user.location} </li>
-                    <li><strong>Ratings:</strong> ⭐ {user.ratings} </li>
+                    <li>
+                        <div className="infoRow">
+                        <span className="truncate usernameText">{user.username}</span>
+                        </div>
+                    </li>
+                    <li>
+                        <div className="infoRow">
+                        <FaEnvelope className="infoIcon" />
+                        <span className="truncate">{user.email}</span>
+                        </div>
+                    </li>
+                    <li>
+                        <div className="infoRow">
+                        <FaMapMarkerAlt className="infoIcon" />
+                        <span className="truncate">{user.location}</span>
+                        </div>
+                    </li>
+                    <li>
+                        <div className="infoRow">
+                        <FaStar className="infoIcon" />
+                        <span className="truncate">{user.ratings}</span>
+                        </div>
+                    </li>
                 </ul>
             </div>
 
             {/* Wishlist Section */}
-            <div className="wishlistContainer">
-                <h2 className="sectionTitle">📚 Wishlist</h2>
+            <div className={`wishlistContainer ${fadeInClass.wishlist}`}>
+                <div className="sectionHeader">
+                    <button className="iconButton"><FaPlus/></button>
+                    <h2 className="sectionTitle">Wishlist</h2>
+                    <button className="iconButton"><FaAngleRight/></button>
+                </div>
                 <ul className="wishlist">
                     {wishlistBooks.length > 0 ? (
                         wishlistBooks.map((book, index) => (
-                            <li key={index} className="wishlistItem">
-                                📖 <strong>{book.title}</strong> | {book.author}
-                            </li>
+                        <li key={index} className="wishlistItem">
+                            <FaBookOpen className="bookIcon" />
+                            <strong>{book.title}</strong>
+                        </li>
                         ))
                     ) : (
                         <li>Loading wishlist...</li>
@@ -85,13 +134,18 @@ const Profile = () => {
             </div>
 
             {/* Offerings Section */}
-            <div className="offeringsContainer">
-                <h2 className="sectionTitle">📦 Offerings</h2>
+            <div className={`offeringsContainer ${fadeInClass.offerings}`}>
+                <div className="sectionHeader">
+                        <button className="iconButton"><FaPlus/></button>
+                        <h2 className="sectionTitle">Offerings</h2>
+                        <button className="iconButton"><FaAngleRight/></button>
+                </div>
                 <ul className="offerings">
                     {offeredBooks.length > 0 ? (
                         offeredBooks.map((book, index) => (
                             <li key={index} className="offeringItem">
-                                📖 <strong>{book.title}</strong> | {book.author}
+                                <FaBookOpen className="bookIcon" />
+                                <strong>{book.title}</strong>
                             </li>
                         ))
                     ) : (
@@ -100,6 +154,9 @@ const Profile = () => {
                 </ul>
             </div>
         </main>
+
+        </div>
+        
     );
 };
 
