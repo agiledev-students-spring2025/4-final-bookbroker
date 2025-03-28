@@ -13,11 +13,12 @@ function generateBook() {
 function getBook(id) {
     faker.seed(id)
 
+    const userid = Math.floor(Math.random() * SEED_CAP)+1
     const book = {
         id: id,
         title: faker.book.title(),
         author: faker.book.author(),
-        user: faker.person.fullName(),
+        userid: userid,
         year: faker.number.int({min: 1930, max:2025}),
         isbn: faker.commerce.isbn(),
         genre: faker.book.genre(),
