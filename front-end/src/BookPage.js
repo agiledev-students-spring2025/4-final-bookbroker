@@ -10,7 +10,7 @@ const BookPage = () => {
     const [book, setBook] = useState({})
 
     useEffect(() => {
-        fetch(`http://localhost:3000/books/${id}`)
+        fetch(`http://localhost:5000/books/${id}`)
         .then(res => res.json())
         .then(data => setBook(data))
         .catch(err => {

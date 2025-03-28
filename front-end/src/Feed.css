@@ -30,6 +30,10 @@
     margin-right: 0.8rem;
 }
 
+.feed-book-text > h2 {
+    font-weight: bold;
+}
+
 .feed-book-text > h2, .feed-book-text > p {
     margin: 0;
     font-size: 1.1rem;
