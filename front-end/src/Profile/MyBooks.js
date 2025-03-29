@@ -9,8 +9,15 @@ const MyBooks = () => {
   const [wishlistBooks, setWishlistBooks] = useState([]);
 
   useEffect(() => {
-    // In production: fetch from backend instead
-    setWishlistBooks(generateBooks(20));
+    fetch("http://localhost:3000/user/wishlist")
+    .then(res => res.json())
+    .then(data => {
+        setWishlistBooks(data);
+    })
+    .catch(err => {
+        console.log("Failed to fetch wishlist:", err);
+        setWishlistBooks({});
+    })
   }, []);
 
   return (

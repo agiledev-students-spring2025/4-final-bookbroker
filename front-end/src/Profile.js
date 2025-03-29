@@ -34,8 +34,25 @@ const Profile = () => {
 
   // Fetch books
   useEffect(() => {
-    setWishlistBooks(generateBooks(4));
-    setOfferedBooks(generateBooks(4));
+    fetch("http://localhost:3000/user/wishlist")
+    .then(res => res.json())
+    .then(data => {
+        setWishlistBooks(data)
+    })
+    .catch(err => {
+        console.log("Failed to fetch wishlist:", err)
+        setWishlistBooks({})
+    })
+
+    fetch("http://localhost:3000/user/offered")
+    .then(res => res.json())
+    .then(data => {
+        setOfferedBooks(data)
+    })
+    .catch(err => {
+        console.log("Failed to fetch offerings", err)
+        setOfferedBooks({})
+    })
   }, []);
 
   // Handle adding a wishlist book
@@ -123,7 +140,7 @@ const Profile = () => {
           </div>
           <ul className="wishlist">
             {wishlistBooks.length > 0 ? (
-              wishlistBooks.map((book, index) => (
+              wishlistBooks.slice(0,4).map((book, index) => (
                 <li key={index} className="wishlistItem">
                   <FaBookOpen className="bookIcon" />
                   <strong>{book.title}</strong>
@@ -148,7 +165,7 @@ const Profile = () => {
           </div>
           <ul className="offerings">
             {offeredBooks.length > 0 ? (
-              offeredBooks.map((book, index) => (
+              offeredBooks.slice(0,4).map((book, index) => (
                 <li key={index} className="offeringItem">
                   <FaBookOpen className="bookIcon" />
                   <strong>{book.title}</strong>

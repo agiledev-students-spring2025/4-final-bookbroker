@@ -9,8 +9,15 @@ const MyBooks = () => {
   const [offeringsBooks, setOfferingsBooks] = useState([]);
 
   useEffect(() => {
-    // In production: fetch from backend instead
-    setOfferingsBooks(generateBooks(20));
+    fetch("http://localhost:3000/user/offered")
+    .then(res => res.json())
+    .then(data => {
+        setOfferingsBooks(data);
+    })
+    .catch(err => {
+        console.log("Failed to fetch offerings:", err);
+        setOfferingsBooks({});
+    })
   }, []);
 
   return (

@@ -14,6 +14,8 @@ import MyTrades from './Profile/MyTrades'
 import Messages from './Messages'
 import BookPage from './BookPage'
 import UserPage from './UserPage'
+import UserPageWishlist from './UserPageWishlist'
+import UserPageOffered from './UserPageOffered'
 import Login from './Login'
 import Navbar from './Navbar';
 
@@ -44,6 +46,8 @@ const App = () => {
         <Route path="messages" element={<Messages />} />
         <Route path="books/:id" element={<BookPage />} />
         <Route path="users/:id" element={<UserPage />} />
+        <Route path="users/:id/wishlist" element={<UserPageWishlist />}/>
+        <Route path="users/:id/offered" element={<UserPageOffered />}/>
       </Routes>
       <Navbar/>
     </Router>

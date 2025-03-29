@@ -9,6 +9,8 @@ import { Link } from 'react-router-dom';
 const UserPage = () => {
     const { id } = useParams()
     const [user, setUser] = useState({});
+    const [wishlistBooks, setWishlistBooks] = useState([]);
+    const [offeredBooks, setOfferedBooks] = useState([]);
 
     useEffect(() => {
             fetch(`http://localhost:3000/users/${id}`)
@@ -21,10 +23,28 @@ const UserPage = () => {
                 console.error('Failed to fetch book:', err);
                 setUser({});
             });
+
+            fetch(`http://localhost:3000/users/${id}/wishlist`)
+            .then(res => res.json())
+            .then(data => {
+                setWishlistBooks(data)
+            })
+            .catch(err => {
+                console.log("Failed to fetch wishlist:", err)
+                setWishlistBooks({})
+            })
+        
+            fetch(`http://localhost:3000/users/${id}/offered`)
+            .then(res => res.json())
+            .then(data => {
+                setOfferedBooks(data)
+            })
+            .catch(err => {
+                console.log("Failed to fetch offerings", err)
+                setOfferedBooks({})
+            })
     }, [id]);
 
-    const [wishlistBooks, setWishlistBooks] = useState([]);
-    const [offeredBooks, setOfferedBooks] = useState([]);
     const [fadeInClass, setFadeInClass] = useState({
         profile: 'fade-start',
         wishlist: 'fade-start',
@@ -37,33 +57,6 @@ const UserPage = () => {
         setTimeout(() => setFadeInClass(prev => ({ ...prev, profile: 'fade-in' })), 200);
         setTimeout(() => setFadeInClass(prev => ({ ...prev, wishlist: 'fade-in' })), 300);
         setTimeout(() => setFadeInClass(prev => ({ ...prev, offerings: 'fade-in' })), 500);
-    }, []);
-
-    // Fetch Books Data
-    useEffect(() => {
-        /*
-        Commenting out until server is ready
-
-        const fetchBooks = async () => {
-            try {
-                const response = await axios.get(`https://my.api.mockaroo.com/books.json?key=${process.env.REACT_APP_MOCK_BOOK_API_KEY_2}`);
-                const books = response.data;
-                console.log(books)
-                const wishlist = books.slice(0, 4); 
-                const offerings = books.slice(4, 8); 
-
-                setWishlistBooks(wishlist);
-                setOfferedBooks(offerings);
-            } catch (error) {
-                console.error('Error fetching book data:', error);
-            }
-        };
-
-        fetchBooks();
-        */
-
-        setWishlistBooks(generateBooks(4))
-        setOfferedBooks(generateBooks(4))
     }, []);
 
     return (
@@ -108,13 +101,13 @@ const UserPage = () => {
             <div className={`wishlistContainer ${fadeInClass.wishlist}`}>
                 <div className="sectionHeader">
                     <h2 className="sectionTitle">Wishlist</h2>
-                    <Link to="/profile/my-books" className="iconButton">
+                    <Link to={`/users/${id}/wishlist`} className="iconButton">
                         <FaAngleRight />
                     </Link>
                 </div>
                 <ul className="wishlist">
                     {wishlistBooks.length > 0 ? (
-                        wishlistBooks.map((book, index) => (
+                        wishlistBooks.slice(0,4).map((book, index) => (
                         <li key={index} className="wishlistItem">
                             <FaBookOpen className="bookIcon" />
                             <strong>{book.title}</strong>
@@ -130,11 +123,13 @@ const UserPage = () => {
             <div className={`offeringsContainer ${fadeInClass.offerings}`}>
                 <div className="sectionHeader">
                         <h2 className="sectionTitle">Offerings</h2>
-                        <button className="iconButton"><FaAngleRight/></button>
+                        <Link to={`/users/${id}/offered`} className="iconButton">
+                            <FaAngleRight />
+                        </Link>
                 </div>
                 <ul className="offerings">
                     {offeredBooks.length > 0 ? (
-                        offeredBooks.map((book, index) => (
+                        offeredBooks.slice(0,4).map((book, index) => (
                             <li key={index} className="offeringItem">
                                 <FaBookOpen className="bookIcon" />
                                 <strong>{book.title}</strong>
