@@ -60,14 +60,21 @@ app.get('/user', (req, res) => {
     res.json(user);
 });
 
+app.get('/users/:id/wishlist', (req, res) => {
+    res.json(generateBooks(10));
+})
+
+app.get('/users/:id/offered', (req, res) => {
+    res.json(generateBooks(10));
+})
+
 app.get('/user/wishlist', (req, res) => {
-    res.json(generateBooks(4)); 
+    res.json(generateBooks(10)); 
 });
 
 app.get('/user/offered', (req, res) => {
-    res.json(generateBooks(4)); 
+    res.json(generateBooks(10)); 
 });
-
 
 // export the express app we created to make it available to other modules
 export default app;
