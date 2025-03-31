@@ -13,7 +13,7 @@ const UserPage = () => {
     const [offeredBooks, setOfferedBooks] = useState([]);
 
     useEffect(() => {
-            fetch(`http://localhost:3000/users/${id}`)
+            fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/users/${id}`)
             .then(res => res.json())
             .then(data => {
                 setUser(data)
@@ -24,7 +24,7 @@ const UserPage = () => {
                 setUser({});
             });
 
-            fetch(`http://localhost:3000/users/${id}/wishlist`)
+            fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/users/${id}/wishlist`)
             .then(res => res.json())
             .then(data => {
                 setWishlistBooks(data)
@@ -34,7 +34,7 @@ const UserPage = () => {
                 setWishlistBooks({})
             })
         
-            fetch(`http://localhost:3000/users/${id}/offered`)
+            fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/users/${id}/offered`)
             .then(res => res.json())
             .then(data => {
                 setOfferedBooks(data)

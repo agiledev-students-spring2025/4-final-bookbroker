@@ -9,7 +9,7 @@ const MyBooks = () => {
   const [offeringsBooks, setOfferingsBooks] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:3000/user/offered")
+    fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/user/offered`)
     .then(res => res.json())
     .then(data => {
         setOfferingsBooks(data);
