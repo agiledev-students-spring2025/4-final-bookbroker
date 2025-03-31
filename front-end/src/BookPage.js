@@ -3,12 +3,16 @@ import { useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom' 
 import { getBookImage } from './MockData.js';
+import { FaAngleLeft } from 'react-icons/fa' 
+import { useNavigate } from 'react-router-dom';
 
 const BookPage = () => {
     const { id } = useParams()
 
     const [book, setBook] = useState({})
     const [user, setUser] = useState({})
+    const navigate = useNavigate();
+
 
     useEffect(() => {
         fetch(`http://localhost:3000/books/${id}`)
@@ -33,21 +37,43 @@ const BookPage = () => {
 
     const bookImageSource = getBookImage(id)
     return (
-        <main className="BookPage content-center mt-10">
-            <div className="header text-center mb-5">            
-                <h1 className="text-4xl">{book.title ? book.title : "[NO TITLE]"}</h1>
-                <h2 className="text-2xl">
-                    Offered by:
-                    <Link to={`/users/${book.userid}`}>
-                    {user.username ? user.username : "[NO USER]"}
-                    </Link>
-                </h2>    
+        <main className="BookPage page-slide-in">
+            <div className="bookpage-header">
+                <button className="iconButton backButton" onClick={() => navigate(-1)}>
+                    <FaAngleLeft />
+                </button>
             </div>
-            <img src={bookImageSource} alt="book" className="mx-auto mb-5" />
-            <div className="book-description text-left mx-10">            
-                <h3>{book.author ? book.author: "[NO AUTHOR]"}, {book.year ? book.year : "[NO DATE]"}</h3>
+
+            <div className="book-title-section">
+                <img src={bookImageSource} alt="book" />
+                <div className="book-info-section">
+                    <h1 className="book-title">{book.title || "[NO TITLE]"}</h1>
+                    <h3 className='book-author'>{book.author ? book.author: "[NO AUTHOR]"}, {book.year ? book.year : "[NO DATE]"}</h3>
+                    <h2 className='book-owner'>
+                        Offered by: 
+                        <Link to={`/users/${book.userid}`}>
+                        { user.username || "[NO USER]"}
+                        </Link>
+                    </h2>
+                </div>
+            </div>
+
+            <div className="book-page-actions">
+                <button className="book-action-btn wishlist-btn">Add to Wishlist</button>
+                <button className="book-action-btn contact-btn">Contact Owner</button>
+            </div>
+
+            <div className="book-description-section">
+                <h1 className="about-this-book">About this book</h1>
                 <p>{book.desc ? book.desc : "[NO DESC]"}</p>
-                <p>ISBN: {book.isbn ? book.isbn : "[NO ISBN]"}, Genre: {book.genre ? book.genre : "[NO GENRE]"}</p>
+            </div>
+            <div className="isbn-section">
+                <h1 className="isbn-header"> ISBN </h1>
+                <h3 className='book-isbn'>{book.isbn ? book.isbn : "[NO ISBN]"}</h3>
+            </div>
+            <div className="genre-section">
+                <h1 className="genre-header"> Genre </h1>
+                <h3 className='book-genre'>{book.genre ? book.genre : "[NO GENRE]"}</h3>
             </div>
         </main>
     )
