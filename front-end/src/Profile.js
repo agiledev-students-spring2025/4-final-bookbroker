@@ -80,7 +80,7 @@ const Profile = () => {
         body: JSON.stringify(data),
     };
 
-    fetch('http://localhost:3000/user/add-wishlist-book', options)
+    fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/user/add-wishlist-book`, options)
     .then(response => {
         if(!response.ok){
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -125,7 +125,7 @@ const Profile = () => {
         body: JSON.stringify(data),
     };
 
-    fetch('http://localhost:3000/user/add-offered-book', options)
+    fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/user/add-offered-book`, options)
     .then(response => {
         if(!response.ok){
             throw new Error(`HTTP error! status: ${response.status}`);
