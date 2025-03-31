@@ -7,6 +7,8 @@ const Home = () => {
     const [books, setBooks] = useState([]);
     const [user, setUser] = useState();
     const screenRefs = useRef([]);
+    const [showToast, setShowToast] = useState(false);
+
 
     useEffect(() => {
         setBooks(generateBooks(5));
@@ -40,6 +42,30 @@ const Home = () => {
         });
     }, [books]);
 
+    const handleAddBook = (book) => {
+        fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/user/add-wishlist-book`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(book)
+        })
+        .then(res => {
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
+            return res.json();
+        })
+        .then(data => {
+            console.log("Book added to wishlist:", data);
+            setShowToast(true);
+            setTimeout(() => setShowToast(false), 2000);
+        })
+        .catch(err => {
+            console.error("Error adding book to wishlist:", err);
+        });
+    };
+
     return (
         <main className="Home">
         <div className="home-header">
@@ -56,6 +82,13 @@ const Home = () => {
             <h3>Today's picks:</h3>
             </div>
         </div>
+        
+        {/*success toast for adding book to wishlist*/}
+        {showToast && (
+            <div className="toast-success">
+                Book added to wishlist!
+            </div>
+        )}
 
         <div>
             {books.length > 0 ? (
@@ -75,21 +108,23 @@ const Home = () => {
                     />
                     {/* Foreground image and info */}
                     <Link to={`/books/${book.id}`}>
-                    <img
-                        src={getBookImage(book.id)}
-                        alt="Book Cover"
-                        className="home-book-image"
-                    />
+                        <img
+                            src={getBookImage(book.id)}
+                            alt="Book Cover"
+                            className="home-book-image"
+                        /> 
+                        <div className="home-book-info-centered">
+                        <p className="home-book-title">{book.title || "[NO TITLE]"}</p>
+                        <p className="home-book-year">{book.year || "[NO DATE]"}</p>
+                        <p className="home-book-author">{book.author || "[NO AUTHOR]"}</p>
+                        </div>
                     </Link>
-                    <div className="home-book-info-centered">
-                    <p className="home-book-title">{book.title || "[NO TITLE]"}</p>
-                    <p className="home-book-year">{book.year || "[NO DATE]"}</p>
-                    <p className="home-book-author">{book.author || "[NO AUTHOR]"}</p>
-                    </div>
 
                     {/* Buttons */}
-                    <button className="home-book-btn wishlist-btn">Add to Wishlist</button>
+                    <button className="home-book-btn wishlist-btn" onClick={() => handleAddBook(book)}>Add to Wishlist</button>
+                    <Link to={`/books/${book.id}`}>
                     <button className="home-book-btn details-btn">View Details</button>
+                    </Link>
                 </div>
                 </div>
             ))

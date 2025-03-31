@@ -8,7 +8,7 @@ const UserPageWishlist = () => {
     const {id} = useParams();
 
     useEffect(() => {
-        fetch(`http://localhost:3000/users/${id}/wishlist`)
+        fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/users/${id}/wishlist`)
         .then(res => res.json())
         .then(data => {
             setWishlistBooks(data);

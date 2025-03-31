@@ -8,7 +8,7 @@ const UserPageOffered = () => {
     const {id} = useParams();
 
     useEffect(() => {
-        fetch(`http://localhost:3000/users/${id}/offered`)
+        fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/users/${id}/offered`)
         .then(res => res.json())
         .then(data => {
             setOfferingsBooks(data);
