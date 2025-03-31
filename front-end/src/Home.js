@@ -1,59 +1,104 @@
-import './Home.css'
-import { generateUser, generateBooks, getBookImage } from './MockData'
-import { Link } from 'react-router-dom'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react';
+import './Home.css';
+import { generateUser, generateBooks, getBookImage } from './MockData';
+import { Link } from 'react-router-dom';
 
 const Home = () => {
-    const [books, setBooks] = useState([])
-    const [user, setUser] = useState()
+    const [books, setBooks] = useState([]);
+    const [user, setUser] = useState();
+    const screenRefs = useRef([]);
 
     useEffect(() => {
-        setBooks(generateBooks(5))
-    }, [])
+        setBooks(generateBooks(5));
+    }, []);
 
     useEffect(() => {
-        setUser(generateUser())
-    }, [])
+        setUser(generateUser());
+    }, []);
+
+    useEffect(() => {
+        // Intersection Observer callback
+        const callback = (entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+            // Fade it in
+            entry.target.classList.add('fade-in');
+            }
+        });
+        };
+
+        const options = {
+        threshold: 0.2, // 20% visible triggers fade
+        };
+
+        // Create observer
+        const observer = new IntersectionObserver(callback, options);
+
+        // Observe each screen
+        screenRefs.current.forEach(screen => {
+            if (screen) observer.observe(screen);
+        });
+    }, [books]);
 
     return (
-        <main className="Home bg-background text-center">
-            <h1 className='text-brown text-heading-lg'>
-                Home
-            </h1>
-            {/* Commenting out for clarity purposes until login is done on server side
-                <a href="/login" className="underline">Login to view books</a>
-            */}
+        <main className="Home">
+        <div className="home-header">
+            <div className="titlebox">
+            <h1 className="title">Home</h1>
+            </div>
+            <div className="home-header-message"> 
             <h3>
                 You've traded {user ? user.trades : 0} books.<br/> 
-                <a href="/feed" className="underline">Make it {user ? user.trades + 1 : 1}!</a>
+                <a href="/feed" className="underline">
+                Make it {user ? user.trades + 1 : 1}!
+                </a>
             </h3>
             <h3>Today's picks:</h3>
-            <div className="book-list">
-                {books.length > 0 ? (
-                books.map((book, index) => (
-                    <div key={book.id} className="book-item">
-                    {/* Book Image */}
-                    <Link to={`/books/${book.id}`}>
-                        <img src={getBookImage(book.id)} alt="Book Cover" className="book-image" />
-                    </Link>
-
-                    {/* Book Details */}
-                    <div className="book-info">
-                        <p className="book-title">{book.title ? book.title : "[NO TITLE]"}</p>
-                        <p className="book-year">{book.year ? book.year : "[NO DATE]"}</p>
-                        <p className="book-author">{book.author ? book.author : "[NO AUTHOR]"}</p>
-                    </div>
-
-                    {/* Show Interest Button */}
-                    <button className="interest-btn">Show Interest</button>
-                    </div>
-                ))
-                ) : (
-                <p className="no-books">No books found in this genre.</p>
-                )}
             </div>
-        </main>
-    )
-}
+        </div>
 
-export default Home
+        <div>
+            {books.length > 0 ? (
+            books.map((book, index) => (
+                <div
+                key={book.id}
+                className="home-book-screen fade-start" // start hidden
+                ref={(el) => (screenRefs.current[index] = el)}
+                >
+                <div className="home-book-wrapper">
+                    {/* Blurred background layer */}
+                    <div
+                    className="home-book-blur"
+                    style={{
+                        backgroundImage: `url(${getBookImage(book.id)})`
+                    }}
+                    />
+                    {/* Foreground image and info */}
+                    <Link to={`/books/${book.id}`}>
+                    <img
+                        src={getBookImage(book.id)}
+                        alt="Book Cover"
+                        className="home-book-image"
+                    />
+                    </Link>
+                    <div className="home-book-info-centered">
+                    <p className="home-book-title">{book.title || "[NO TITLE]"}</p>
+                    <p className="home-book-year">{book.year || "[NO DATE]"}</p>
+                    <p className="home-book-author">{book.author || "[NO AUTHOR]"}</p>
+                    </div>
+
+                    {/* Buttons */}
+                    <button className="home-book-btn wishlist-btn">Add to Wishlist</button>
+                    <button className="home-book-btn details-btn">View Details</button>
+                </div>
+                </div>
+            ))
+            ) : (
+            <p className="no-books">No books found in this genre.</p>
+            )}
+        </div>
+        </main>
+    );
+};
+
+export default Home;
