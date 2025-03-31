@@ -34,7 +34,7 @@ const Profile = () => {
 
   // Fetch books
   useEffect(() => {
-    fetch("http://localhost:3000/user/wishlist")
+    fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/user/wishlist`)
     .then(res => res.json())
     .then(data => {
         setWishlistBooks(data)
@@ -44,7 +44,7 @@ const Profile = () => {
         setWishlistBooks({})
     })
 
-    fetch("http://localhost:3000/user/offered")
+    fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/user/offered`)
     .then(res => res.json())
     .then(data => {
         setOfferedBooks(data)
