@@ -9,7 +9,7 @@ const ByCategory = () => {
 
 
     useEffect(() => {
-        fetch('http://localhost:5000/genres') 
+        fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/genres`) 
         .then((res) => res.json())
         .then((data) => {
             setGenres(data);
