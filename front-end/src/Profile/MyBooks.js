@@ -9,7 +9,7 @@ const MyBooks = () => {
   const [wishlistBooks, setWishlistBooks] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:3000/user/wishlist")
+    fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/user/wishlist`)
     .then(res => res.json())
     .then(data => {
         setWishlistBooks(data);

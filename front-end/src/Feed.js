@@ -7,7 +7,7 @@ const Feed = () => {
     const [ booksData, setBooksData ] = useState([]);
 
     useEffect(() => {
-        fetch('http://localhost:3000/feed')
+        fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/feed`)
         .then(res => res.json())
         .then(data => setBooksData(data))
         .catch(err => {

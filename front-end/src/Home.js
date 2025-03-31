@@ -43,7 +43,7 @@ const Home = () => {
     }, [books]);
 
     const handleAddBook = (book) => {
-        fetch('http://localhost:3000/user/add-wishlist-book', {
+        fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/user/add-wishlist-book`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

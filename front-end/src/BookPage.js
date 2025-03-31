@@ -15,11 +15,11 @@ const BookPage = () => {
 
 
     useEffect(() => {
-        fetch(`http://localhost:3000/books/${id}`)
+        fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/books/${id}`)
         .then(res => res.json())
         .then(data => {
             setBook(data)
-            fetch(`http://localhost:3000/users/${data.userid}`)
+            fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/users/${data.userid}`)
             .then(res => res.json())
             .then(data => {
                 setUser(data)
