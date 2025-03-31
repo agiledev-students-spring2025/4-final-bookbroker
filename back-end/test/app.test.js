@@ -57,3 +57,19 @@ it('GET /genres/:genre should return filtered books', (done) => {
       done();
     });
 });
+
+it('GET /feed should return a nonempty array of book objects', (done) => {
+  request
+    .agent(app)
+    .get('/feed')
+    .end((err, res) => {
+      expect(err).to.be.null;
+      expect(res).to.have.status(200);
+      expect(res).to.be.json;
+      expect(res.body).to.be.an('array');
+      expect(res.body[0]).to.have.property('title');
+      expect(res.body[0]).to.have.property('author');
+      expect(res.body[0]).to.have.property('userid');
+      done();
+    });
+});
