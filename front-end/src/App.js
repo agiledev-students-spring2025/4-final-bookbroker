@@ -18,6 +18,7 @@ import UserPageWishlist from './UserPageWishlist'
 import UserPageOffered from './UserPageOffered'
 import Login from './Login'
 import Navbar from './Navbar';
+import MessagesDetail from './MessagesDetail'
 
 const App = () => {
   return (
@@ -43,7 +44,9 @@ const App = () => {
           <Route path="my-books" element={<MyBooks />} />
           <Route path="my-trades" element={<MyTrades />} />
         </Route>
-        <Route path="messages" element={<Messages />} />
+        <Route path="messages" element={<Messages />}/>
+        <Route path="messages/:user" element={<MessagesDetail/>}/>
+
         <Route path="books/:id" element={<BookPage />} />
         <Route path="users/:id" element={<UserPage />} />
         <Route path="users/:id/wishlist" element={<UserPageWishlist />}/>

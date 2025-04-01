@@ -81,4 +81,52 @@ function getUser(id) {
     return user
 }
 
-export { generateBook, getBook, generateBooks, getBookImage, getGenres, getUser, generateUser }
+// Generate one message
+function generateMessage(senderId, receiverId){
+    return {
+        id: faker.string.uuid(),
+        senderId: senderId,
+        receiverId: receiverId,
+        content: faker.lorem.sentences({ min:1, max:3 }),
+        timestamp: faker.date.recent({ days: 30 }).toISOString(),
+    };
+}
+
+// Generate multiple messages between two users
+function generateConversation(user1Id, user2Id, messageCount = 5){
+    const messages = [];
+    for( let i = 0; i < messageCount; i++ ){
+        // Alternating sender
+        const senderId = i % 2 === 0 ? user1Id : user2Id;
+        const receiverId = senderId === user1Id ? user2Id : user1Id;
+
+        messages.push(generateMessage(senderId, receiverId));
+    }
+
+    // Return messages in order by date
+    return messages.sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
+}
+
+// Generate multiple messages from random users
+function generateMessages(user1Id, messageCount = 5){
+    let conversations = [];
+    for (let i = 0; i < messageCount; i++) {
+        // Generate random user
+        const otherUserId = Math.floor(Math.random() * SEED_CAP) + 1;
+
+        // Randomly choose client or other user as a sender
+        // This is probably not necessary (?)
+        const sender = faker.datatype.boolean() ? user1Id : otherUserId;
+        const reciever = sender === user1Id ? otherUserId : user1Id;
+
+        const message = generateMessage(sender, reciever)
+
+        // Send back a message and the associated user
+        conversations.push({otherUser: getUser(otherUserId), lastMessage: message});
+    };
+    return conversations;
+}
+
+
+
+export { generateBook, getBook, generateBooks, getBookImage, getGenres, getUser, generateUser, generateMessages, generateConversation }
