@@ -6,21 +6,19 @@ const MessagesDetail = () => {
     const { user } = useParams();
 
     const [messages, setMessages] = useState([]);
-
     useEffect(() => {
-        // Fake fetch
-        // This will be all messages sent between this client and the other user
-        const fetchMessages = async () => {
-            const fakeMessages = [
-            { sender: "Alice", content: "Hi, I'd like this book!", timestamp: "2025-04-01T12:00:00Z" },
-            { sender: "You", content: "Let's meet at 5 PM.", timestamp: "2025-04-01T10:30:00Z" },
-            { sender: "Alice", content: "Sounds good!", timestamp: "2025-04-01T12:10:00Z" },
-            ];
-            setMessages(fakeMessages);
-        };
-  
-        fetchMessages();
-    }, []);
+        fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/messages/${user}`)
+        .then(res => res.json())
+        .then(data => {
+            console.log(data)
+            setMessages(data)
+        })
+        .catch(err => {
+            console.log("Failed to fetch messages:", err)
+            setMessages([])
+        })
+    }, [])
+
 
     return (
         <main>
@@ -36,7 +34,7 @@ const MessagesDetail = () => {
                             {/* Div box for pfp, username, and text*/}
                             <div className="flex items-center space-x-3">
                                 <img className="w-10 h-10 bg-gray-300" alt="Profile" />
-                                <p className="font-bold text-brown">{user}</p>
+                                <p className="font-bold text-brown">{message.sender}</p>
 
 
                                 {/* Trunkate text to ensure the box doesn't break */}
