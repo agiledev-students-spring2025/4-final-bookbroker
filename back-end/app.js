@@ -6,7 +6,9 @@ import {
   getGenres,
   getUser,
   generateUser,
-  getBookImage
+  getBookImage,
+  generateMessages,
+  generateConversation
 } from './Data.js';
 
 const app = express();
@@ -40,6 +42,47 @@ app.get("/genres/:genre", (req, res) => {
     );
     res.json(books);
 });
+
+app.get("/messages", (req, res) => {
+    const currentUserId = Math.floor(Math.random() * 2500000) + 1;
+
+    // Generate array of users and messages
+    const messages = generateMessages(currentUserId);
+
+    // Format messages so the frontend can use interpret them
+    const formattedMessages = messages.map(msg => ({
+        id: msg.id,
+        otherUser: msg.otherUser.username,
+        sender: msg.lastMessage.senderId === currentUserId ? "You" : msg.otherUser.username,
+        receiver: msg.lastMessage.receiverId === currentUserId ? "You" : msg.otherUser.username,
+        content: msg.lastMessage.content,
+        timestamp: msg.lastMessage.timestamp
+      }));
+    res.json(formattedMessages)
+})
+
+app.get("/messages/:user", (req, res) => {
+    const clientUserId = Math.floor(Math.random() * 2500000) + 1;
+
+    // Find other user by username
+    // This is where we'll query the DB
+    const otherUser = generateUser();
+    otherUser.username = req.params.user; // Currently override the generated username with the requested username for continuity purposes
+
+    // Generate array of messages
+    const conversation = generateConversation(clientUserId, otherUser.id);
+
+    // Format conversation for front end
+    const formattedConversation = conversation.map(msg => ({
+        id: msg.id,
+        sender: msg.senderId === clientUserId ? "You" : otherUser.username,
+        receiver: msg.receiverId === clientUserId ? "You" : otherUser.username,
+        content: msg.content,
+        timestamp: msg.timestamp
+    }));
+
+    res.json(formattedConversation);
+})
 
 app.get('/feed', (req, res) => {
     const books = generateBooks(20).map(book => ({
