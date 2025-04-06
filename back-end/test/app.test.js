@@ -157,3 +157,46 @@ it("GET /user/offered should return the current user's wishlist", (done) => [
     })
 ])
 
+it("POST /user/add-wishlist-book should return a success message", (done) => {
+
+  const data = {
+    title: "book-title",
+    author: "book-author",
+    publisher: "book-publisher"
+  };
+
+  request
+    .agent(app)
+    .post('/user/add-wishlist-book')
+    .send(data)
+    .end((err, res)=> {
+      expect(err).to.be.null
+      expect(res).to.have.status(200)
+      expect(res.body).to.be.an('object')
+      expect(res.body).to.have.property('message', 'successfully added wishlist book')
+      done()
+    })
+})
+
+
+it("POST /user/add-offered-book should return a success message", (done) => {
+
+  const data = {
+    title: "book-title",
+    author: "book-author",
+    publisher: "book-publisher"
+  };
+  
+  request
+    .agent(app)
+    .post('/user/add-offered-book')
+    .send(data)
+    .end((err, res)=> {
+      expect(err).to.be.null
+      expect(res).to.have.status(200)
+      expect(res.body).to.be.an('object')
+      expect(res.body).to.have.property('message', 'successfully added offered book')
+      done()
+    })
+})
+
