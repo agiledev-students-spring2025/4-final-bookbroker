@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { generateUser, generateBooks } from './MockData.js';
 import { FaMapMarkerAlt, FaEnvelope, FaStar, FaBookOpen, FaPlus, FaAngleRight } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
+import Popup from 'reactjs-popup';
 
 const Profile = () => {
   const [user, setUser] = useState({});
@@ -146,6 +147,39 @@ const Profile = () => {
     setShowAddOfferingsModal(false);
   };
 
+  const handleProfileEdit = (e) => {
+    const username = e.target.username.value
+    const email = e.target.email.value
+    const location = e.target.location.value
+
+    const data = {
+        user: {
+            username: username,
+            email: email,
+            location: location
+        }
+    }
+
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    }
+
+    fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/profile/edit`, options)
+        .then(response => {
+            if(!response.ok){
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("new user data: ", data.user)
+        })
+  }
+
   return (
     <div>
       <div className="titlebox">
@@ -161,7 +195,19 @@ const Profile = () => {
                 src="https://www.gravatar.com/avatar/2c7d99fe281ecd3bcd65ab915bac6dd5?s=250"
                 alt="Profile"
                 />
-                <button className="editProfileBtn">Edit Profile</button>
+                <Popup trigger={<button className="editProfileBtn">Edit Profile</button>}>
+                    <div className="edit-popup">
+                        <form onSubmit={handleProfileEdit}>
+                            <label htmlFor="username">Enter username: </label><br />
+                            <input type="text" name="username" /><br />
+                            <label htmlFor="email">Enter email: </label><br />
+                            <input type="text" name="email" /><br />
+                            <label htmlFor="location">Enter location: </label><br />
+                            <input type="text" name="location" /><br />
+                            <input type="submit" />
+                        </form>
+                    </div>
+                </Popup>
             </div>
             <ul className="infoList">
                 <li>

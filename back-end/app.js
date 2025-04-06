@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors'; 
+import bodyParser from 'body-parser';
 import {
   generateBooks,
   getBook,
@@ -15,6 +16,8 @@ const app = express();
 
 app.use(cors()); 
 app.use(express.json());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }))
 
 app.get("/books", (req, res) => {
     const query = req.query.query?.toLowerCase() || "";
@@ -127,6 +130,12 @@ app.post('/user/add-wishlist-book', (req, res) => {
 app.post('/user/add-offered-book', (req, res) => {
     const book = req.body;
     res.status(200).json({ message: 'successfully added offered book' });
+})
+
+app.post('/profile/edit', (req, res) => {
+    const user = req.body.user
+    console.log(user)
+    res.status(200).json(user)
 })
 // export the express app we created to make it available to other modules
 export default app;
