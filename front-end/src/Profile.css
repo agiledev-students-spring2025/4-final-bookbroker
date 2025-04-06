@@ -228,9 +228,9 @@ body {
     
     display: flex;
     align-items: flex-end; 
-  }
+}
   
-  .modalSheet {
+.modalSheet {
     width: 100%;
     min-height: 60vh;
     background-color: #fff;
@@ -238,43 +238,43 @@ body {
     padding: 20px;
     text-align: center;
     animation: slideUp 0.3s ease-out forwards;
-  }
-  
-  @keyframes slideUp {
-    0% {
-      transform: translateY(100%); 
-    }
-    100% {
-      transform: translateY(0);   
-    }
-  }
+}
+
+@keyframes slideUp {
+0% {
+    transform: translateY(100%); 
+}
+100% {
+    transform: translateY(0);   
+}
+}
   
 
-  .modalSheet form > div {
+.modalSheet form > div {
     margin-bottom: 15px;
-  }
-  
-  .modalSheet label {
+}
+
+.modalSheet label {
     display: inline-block;
     width: 80px;
     font-weight: bold;
     text-align: right;
     margin-right: 10px;
-  }
+}
   
-  .modalSheet input {
+.modalSheet input {
     padding: 4px 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
     width: calc(100% - 100px);
  
-  }
+}
   
-  .modalSheet h2 {
+.modalSheet h2 {
     margin-top: 0;
     margin-bottom: 20px;
     font-size: 1.5rem;
-  }
+}
 
 
 .modalFields {
@@ -282,35 +282,53 @@ body {
     border-radius: 6px;
     padding: 10px 15px;
     margin-bottom: 20px;
-  }
+}
 
-  .fieldRow {
+.fieldRow {
     display: flex;
     flex-direction: row;
     padding: 8px 0;
     border-bottom: 1px solid #ccc;
-  }
+}
   
-  .fieldRow:last-of-type {
+.fieldRow:last-of-type {
     border-bottom: none; 
-  }
+}
   
-  .fieldRow label {
+.fieldRow label {
     font-weight: bold;
     margin-bottom: 4px; 
     text-align: left;  
-  }
+}
   
-  .fieldRow input {
+.fieldRow input {
     padding: 6px 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
-  }
+}
+  
+.edit-popup {
+    display: block;
+    position: fixed;
+    width: 300px;
+    height: 400px;
+    background-color: white;
+    border: 10px solid black;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.edit-popup input {
+    border: 2px solid black;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    padding: 2px;
+}
   
 
-  
-
-  .toast-success-wishlist, .toast-success-offerings {
+.toast-success-wishlist, .toast-success-offerings {
     position: fixed;
     bottom: 80px;
     left: 50%;
