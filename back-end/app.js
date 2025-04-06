@@ -121,13 +121,11 @@ app.get('/user/offered', (req, res) => {
 
 app.post('/user/add-wishlist-book', (req, res) => {
     const book = req.body;
-    console.log(book);
     res.status(200).json({ message: 'successfully added wishlist book' });
 })
 
 app.post('/user/add-offered-book', (req, res) => {
     const book = req.body;
-    console.log(book);
     res.status(200).json({ message: 'successfully added offered book' });
 })
 // export the express app we created to make it available to other modules
