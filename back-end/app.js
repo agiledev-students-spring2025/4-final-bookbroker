@@ -33,6 +33,22 @@ app.get("/books/:id", (req, res) => {
     res.json(book);
 });
 
+app.get('/popular', (req, res) => {
+    const books = generateBooks(20).map(book => ({
+        ...book,
+        imageUrl: getBookImage(book.id),
+      }));
+      res.json(books);
+});
+
+app.get('/new', (req, res) => {
+    const books = generateBooks(20).map(book => ({
+        ...book,
+        imageUrl: getBookImage(book.id),
+      }));
+      res.json(books);
+});
+
 app.get("/genres", (req, res) => {
     const genres = [...new Set(getGenres(15))];
     res.json(genres);
