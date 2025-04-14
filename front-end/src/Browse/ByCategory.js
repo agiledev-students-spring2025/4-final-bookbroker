@@ -1,41 +1,42 @@
-import './ByCategory.css'
+import './ByCategory.css';
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from 'react'
-import { getGenres } from '../MockData.js'
+import { useEffect, useState } from 'react';
 
 const ByCategory = () => {
-    const navigate = useNavigate();
-    const [genres, setGenres] = useState([]);
+  const navigate = useNavigate();
+  const [genres, setGenres] = useState([]);
 
+  useEffect(() => {
+    fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/genres`)
+      .then((res) => res.json())
+      .then((data) => {
+        setGenres(data);
+      })
+      .catch((error) => {
+        console.error('Failed to fetch genres:', error);
+        setGenres([]);
+      });
+  }, []);
 
-    useEffect(() => {
-        fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/genres`) 
-        .then((res) => res.json())
-        .then((data) => {
-            setGenres(data);
-        })
-        .catch((error) => {
-            console.error('Failed to fetch genres:', error);
-        });
-}, []);
+  return (
+    <main className="ByCategory">
+      <div className="titlebox">
+        <h1 className='title'>Choose a Genre</h1>
+      </div>
+      <ul className="category-list">
+        {genres.map((genre, index) => (
+          <li key={index}>
+            <button
+              onClick={() => navigate(`/browse/by-category/${encodeURIComponent(genre.toLowerCase())}`)}
+              className="category-btn"
+            >
+              {genre.charAt(0).toUpperCase() + genre.slice(1)}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </main>
+  );
+};
 
-    return (
-        <main className="ByCategory">
-            <div className="titlebox">
-                <h1 className='title'>Choose a Genre</h1>
-            </div>
-            <ul className="category-list">
-                {genres.map((genre, index) => (
-                <li key={index}>
-                    <button onClick={() => navigate(`/browse/by-category/${genre.toLowerCase()}`)} className="category-btn">
-                    {genre.charAt(0).toUpperCase() + genre.slice(1)}
-                    </button>
-                </li>
-                ))}
-            </ul>
-
-        </main>
-    )
-}
-
-export default ByCategory
+export default ByCategory;
