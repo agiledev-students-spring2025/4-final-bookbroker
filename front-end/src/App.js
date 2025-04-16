@@ -19,6 +19,7 @@ import UserPageOffered from './UserPageOffered'
 import Login from './Login'
 import Navbar from './Navbar';
 import MessagesDetail from './MessagesDetail'
+import Signup from './Signup'
 
 const App = () => {
   return (
@@ -28,6 +29,7 @@ const App = () => {
         <Route path="home" element={<Home />} />
         <Route path="feed" element={<Feed />} />
         <Route path="login" element={<Login />} />
+        <Route path="signup" element={<Signup />} />
         <Route path="browse" >
           <Route index element={<Browse />} />
           <Route path="newly-added" element={<NewlyAdded />} />
