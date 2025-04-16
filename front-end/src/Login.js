@@ -52,11 +52,6 @@ export default function Login() {
                 <input type="password" id="password" name="password" required />
             </div>
 
-            <div className="form-confirm">
-                <label htmlFor="confirm">Confirm Password:</label>
-                <input type="password" id="confirm" name="confirm" required />
-            </div>
-
             {error && <p className="error-message">{error}</p>}
 
             <div className="form-footer">
