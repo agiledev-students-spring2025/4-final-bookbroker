@@ -178,17 +178,28 @@ const fetchUserData = () => {
             <img className="profilePhoto" src="https://www.gravatar.com/avatar/2c7d99fe281ecd3bcd65ab915bac6dd5?s=250" alt="Profile" />
 
             <div className="profile-buttons">
-              <Popup trigger={<button className="editProfileBtn">Edit Profile</button>}>
+              <Popup
+              trigger={<button className="editProfileBtn">Edit Profile</button>}
+              modal>
                 <div className="edit-popup">
-                  <form onSubmit={handleProfileEdit}>
-                    <label htmlFor="username">Enter username: </label><br />
-                    <input type="text" name="username" /><br />
-                    <label htmlFor="email">Enter email: </label><br />
-                    <input type="text" name="email" /><br />
-                    <label htmlFor="location">Enter location: </label><br />
-                    <input type="text" name="location" /><br />
-                    <input type="submit" />
-                  </form>
+                <form onSubmit={handleProfileEdit}>
+                <div className="form-group">
+                    <label htmlFor="username">Enter username:</label>
+                    <input type="text" name="username" id="username" />
+                </div>
+
+                <div className="form-group">
+                    <label htmlFor="email">Enter email:</label>
+                    <input type="text" name="email" id="email" />
+                </div>
+
+                <div className="form-group">
+                    <label htmlFor="location">Enter location:</label>
+                    <input type="text" name="location" id="location" />
+                </div>
+
+                <button type="submit" className="editProfileBtn">Submit</button>
+                </form>
                 </div>
               </Popup>
 
