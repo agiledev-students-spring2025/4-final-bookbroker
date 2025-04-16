@@ -7,9 +7,14 @@ import { Link } from 'react-router-dom';
 const MyBooks = () => {
 
   const [wishlistBooks, setWishlistBooks] = useState([]);
-
+  
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/user/wishlist`)
+    const token = localStorage.getItem("token");
+    fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/user/wishlist`, {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    })
     .then(res => res.json())
     .then(data => {
         setWishlistBooks(data);

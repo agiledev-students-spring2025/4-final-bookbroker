@@ -4,8 +4,37 @@ import { useState } from "react";
 export default function Login() {
     const [error, setError] = useState('');
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+
+        const password = e.target.password.value;
+        const email = e.target.email.value;
+
+        try{
+            const response = await fetch('http://localhost:5000/auth/login', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ email, password })
+            })
+            
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Login failed');
+            }
+
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('userId', data.user.id);
+            localStorage.setItem('username', data.user.username);
+
+            window.location.href = "/home";
+        }
+        catch (err){
+            console.log(err)
+            setError(err.message)
+        }
 
         setError('');
         console.log('Form submitted successfully!');
@@ -16,11 +45,6 @@ export default function Login() {
             <div className="form-email">
                 <label htmlFor="email">Email:</label>
                 <input type="text" id="email" name="email" required />
-            </div>
-
-            <div className="form-user">
-                <label htmlFor="username">Username:</label>
-                <input type="text" id="username" name="username" required />
             </div>
 
             <div className="form-pass">
