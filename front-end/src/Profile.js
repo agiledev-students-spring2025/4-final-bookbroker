@@ -37,6 +37,19 @@ const Profile = () => {
   const [searchResultsOffer, setSearchResultsOffer] = useState([]);
   const [selectedBookOffer, setSelectedBookOffer] = useState(null);
   const token = localStorage.getItem('token');
+  const userId = localStorage.getItem('userId')
+
+
+const fetchUserData = () => {
+    fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/user?id=${userId}`, {
+        headers: {
+        "Authorization": `Bearer ${token}`
+        }
+    })
+        .then(res => res.json())
+        .then(data => setUser(data))
+        .catch(err => console.log('Failed to fetch user:', err));
+};
 
   useEffect(() => {
     setTimeout(() => setFadeInClass(prev => ({ ...prev, profile: 'fade-in' })), 200);
@@ -45,7 +58,7 @@ const Profile = () => {
   }, []);
 
   useEffect(() => {
-    setUser(generateUser());
+    fetchUserData();
   }, []);
 
   useEffect(() => {
@@ -116,13 +129,16 @@ const Profile = () => {
 
     const data = { user: { username, email, location } };
 
-    fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/profile/edit`, {
+    fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/user/edit`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},
       body: JSON.stringify(data)
     })
       .then(res => res.json())
-      .then(data => console.log("new user data:", data.user))
+      .then(data => {
+        console.log("new user data:", data.user);
+        fetchUserData();
+      })
       .catch(console.error);
   };
 
@@ -184,7 +200,7 @@ const Profile = () => {
           <ul className="infoList">
             <li><div className="infoRow"><span className="truncate usernameText">{user.username}</span></div></li>
             <li><div className="infoRow"><FaEnvelope className="infoIcon" /><span className="truncate">{user.email}</span></div></li>
-            <li><div className="infoRow"><FaMapMarkerAlt className="infoIcon" /><span className="truncate">{user.location}</span></div></li>
+            <li><div className="infoRow"><FaMapMarkerAlt className="infoIcon" /><span className="truncate">{user.location??'N/A'}</span></div></li>
             <li><div className="infoRow"><FaStar className="infoIcon" /><span className="truncate">{user.ratings}</span></div></li>
           </ul>
         </div>
