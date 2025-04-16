@@ -19,15 +19,17 @@ import UserPageOffered from './UserPageOffered'
 import Login from './Login'
 import Navbar from './Navbar';
 import MessagesDetail from './MessagesDetail'
+import Signup from './Signup'
 
 const App = () => {
   return (
     <Router basename={process.env.PUBLIC_URL}>
       <Routes>
-        <Route index element={<Navigate to="home" replace />} />
+        <Route index element={<Navigate to="login" replace />} />
         <Route path="home" element={<Home />} />
         <Route path="feed" element={<Feed />} />
         <Route path="login" element={<Login />} />
+        <Route path="signup" element={<Signup />} />
         <Route path="browse" >
           <Route index element={<Browse />} />
           <Route path="newly-added" element={<NewlyAdded />} />
