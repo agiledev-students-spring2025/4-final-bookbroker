@@ -84,13 +84,17 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post("/auth/register", async (req, res) => {
-    const { username, email } = req.body;
+    const { username, email, password } = req.body;
+    console.log(username)
+    console.log(email)
+    console.log(password)
+
     try {
       const existingUser = await User.findOne({ email });
       if (existingUser) return res.status(400).json({ message: "User already exists" });
   
       const hashedPassword = await bcrypt.hash(password, 10);
-      const user = new User({ username, email, password: hashedPassword, location });
+      const user = new User({ username, email, password: hashedPassword, location: null});
       await user.save();
   
       res.status(201).json({ message: "User registered successfully" });
@@ -112,6 +116,7 @@ app.post("/auth/login", async (req, res) => {
       if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
   
       const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '2h' });
+      console.log(token)
       res.json({ token, user: { id: user._id, username: user.username } });
     } catch (err) {
       res.status(500).json({ error: err.message });

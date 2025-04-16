@@ -21,7 +21,7 @@ export default function Signup() {
         setError('');
         
         try {
-            const response = await fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/signup`, {
+            const response = await fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/auth/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, username, password })

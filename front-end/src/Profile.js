@@ -36,6 +36,7 @@ const Profile = () => {
   const [searchTextOffer, setSearchTextOffer] = useState("");
   const [searchResultsOffer, setSearchResultsOffer] = useState([]);
   const [selectedBookOffer, setSelectedBookOffer] = useState(null);
+  const token = localStorage.getItem('token');
 
   useEffect(() => {
     setTimeout(() => setFadeInClass(prev => ({ ...prev, profile: 'fade-in' })), 200);
@@ -48,12 +49,20 @@ const Profile = () => {
   }, []);
 
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/user/wishlist`)
+    fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/user/wishlist`, {
+        headers: {
+        'Authorization': `Bearer ${token}`
+        }
+    })
       .then(res => res.json())
       .then(data => setWishlistBooks(data))
       .catch(err => console.log("Failed to fetch wishlist:", err));
 
-    fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/user/offered`)
+    fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/user/offered`, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
       .then(res => res.json())
       .then(data => setOfferedBooks(data))
       .catch(err => console.log("Failed to fetch offerings", err));
@@ -65,7 +74,7 @@ const Profile = () => {
 
     fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/user/add-wishlist-book`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},
       body: JSON.stringify(selectedBook)
     })
       .then(res => res.json())
@@ -85,7 +94,7 @@ const Profile = () => {
 
     fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/user/add-offered-book`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},
       body: JSON.stringify(selectedBookOffer)
     })
       .then(res => res.json())
@@ -117,6 +126,29 @@ const Profile = () => {
       .catch(console.error);
   };
 
+  const handleLogout = () => {
+    fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/logout`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    })
+      .then(res => res.json())
+      .then(data => {
+        console.log("Logout success:", data);
+  
+        //Remove tokens and user info from localStorage
+        localStorage.removeItem('token');
+        localStorage.removeItem('username');
+        localStorage.removeItem('userId');
+  
+        //Redirect to login
+        window.location.href = '/login';
+      })
+      .catch(err => {
+        console.error("Logout error:", err);
+      });
+  };
+  
+
   const navigate = useNavigate();
 
   return (
@@ -145,18 +177,7 @@ const Profile = () => {
               </Popup>
 
               <button className="editProfileBtn logout-button"
-                onClick={() => {
-                  fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/logout`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                  })
-                    .then(res => res.json())
-                    .then(data => {
-                      console.log("Logout successful:", data);
-                      navigate('/login');
-                    })
-                    .catch(console.error);
-                }}
+                onClick={handleLogout}
               > Logout </button>
             </div>          
           </div>
