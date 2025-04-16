@@ -26,3 +26,17 @@
     border: 1px solid black;
     background-color: white;
 }
+
+.login-form > div > input {
+    width: 100%;
+}
+
+.error-message {
+    margin-bottom: 0.5rem;
+    color: rgb(158, 0, 0);
+}
+
+.form-footer {
+    display: flex;
+    justify-content: space-between;
+}
