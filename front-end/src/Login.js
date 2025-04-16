@@ -4,15 +4,31 @@ import { useState } from "react";
 export default function Login() {
     const [error, setError] = useState('');
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         const password = e.target.password.value;
-        const confirmPassword = e.target.confirm.value;
+        const email = e.target.email.value;
 
-        if (password !== confirmPassword) {
-            setError('Passwords do not match!');
-            return;
+        try{
+            const response = await fetch('http://localhost:5000/auth/login', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ email, password })
+            })
+            
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Login failed');
+            }
+
+        }
+        catch (err){
+            console.log(err)
+            setError(err.message)
         }
 
         setError('');

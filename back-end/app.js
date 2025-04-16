@@ -84,7 +84,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post("/auth/register", async (req, res) => {
-    const { username, email, password, location } = req.body;
+    const { username, email } = req.body;
     try {
       const existingUser = await User.findOne({ email });
       if (existingUser) return res.status(400).json({ message: "User already exists" });
@@ -101,8 +101,11 @@ app.post("/auth/register", async (req, res) => {
 
 app.post("/auth/login", async (req, res) => {
     const { email, password } = req.body;
+    console.log(email);
+    console.log(password)
     try {
       const user = await User.findOne({ email });
+      console.log(user)
       if (!user) return res.status(400).json({ message: "Invalid credentials" });
   
       const isMatch = await bcrypt.compare(password, user.password);
