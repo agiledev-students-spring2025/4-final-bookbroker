@@ -94,7 +94,7 @@ app.post("/auth/register", async (req, res) => {
       if (existingUser) return res.status(400).json({ message: "User already exists" });
   
       const hashedPassword = await bcrypt.hash(password, 10);
-      const user = new User({ username, email, password: hashedPassword, location: null});
+      const user = new User({ username, email, password: hashedPassword, location: null, ratings: 5});
       await user.save();
   
       res.status(201).json({ message: "User registered successfully" });
@@ -116,7 +116,6 @@ app.post("/auth/login", async (req, res) => {
       if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
   
       const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '2h' });
-      console.log(token)
       res.json({ token, user: { id: user._id, username: user.username } });
     } catch (err) {
       res.status(500).json({ error: err.message });
@@ -226,12 +225,14 @@ app.get("/users/:id", (req, res) => {
   res.json(user);
 });
 
-
+//middleware for authentication, every route after this line will be checked for authentication
+//modify the front end code accordingly (see Login.js for an example)
 app.use(authMiddleware)
 
-app.get("/user", (req, res) => {
-  const user = generateUser();
-  res.json(user);
+app.get("/user", async (req, res) => {
+    const userId = req.query.id;
+    const user = await User.findById(userId);
+    res.json(user);
 });
 
 app.get("/user/wishlist", async (req, res) => {
@@ -300,10 +301,27 @@ app.post("/user/search-google-books", async (req, res) => {
   }
 });
 
-app.post("/profile/edit", (req, res) => {
-  const user = req.body.user;
-  console.log(user);
-  res.status(200).json(user);
+app.post("/user/edit", authMiddleware, async (req, res) => {
+try {
+    const userId = req.user.userId;
+    const { username, email, location } = req.body.user;
+
+    const update = {};
+    if (username.trim() != null && username.trim() != "") update.username = username.trim();
+    if (email.trim() != null && email.trim()!="") update.email = email.trim();
+    if (location.trim() != null && location.trim() != "") update.location = location.trim();
+
+    const updatedUser = await User.findByIdAndUpdate(
+    userId,
+    { $set: update },
+    { new: true }
+    );
+
+    res.json({ message: "User updated", user: updatedUser });
+} catch (err) {
+    console.error("Error updating user:", err);
+    res.status(500).json({ message: "Internal server error" });
+}
 });
 
 app.post("/logout", (req, res) => {
