@@ -25,7 +25,7 @@ const App = () => {
   return (
     <Router basename={process.env.PUBLIC_URL}>
       <Routes>
-        <Route index element={<Navigate to="home" replace />} />
+        <Route index element={<Navigate to="login" replace />} />
         <Route path="home" element={<Home />} />
         <Route path="feed" element={<Feed />} />
         <Route path="login" element={<Login />} />
