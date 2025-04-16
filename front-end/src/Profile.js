@@ -1,5 +1,6 @@
 import './Profile.css';
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { generateUser } from './MockData.js';
 import { FaMapMarkerAlt, FaEnvelope, FaStar, FaBookOpen, FaPlus, FaAngleRight } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
@@ -116,6 +117,8 @@ const Profile = () => {
       .catch(console.error);
   };
 
+  const navigate = useNavigate();
+
   return (
     <div>
       <div className="titlebox">
@@ -141,7 +144,20 @@ const Profile = () => {
                 </div>
               </Popup>
 
-              <button className="editProfileBtn logout-button"> Logout </button>
+              <button className="editProfileBtn logout-button"
+                onClick={() => {
+                  fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/logout`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                  })
+                    .then(res => res.json())
+                    .then(data => {
+                      console.log("Logout successful:", data);
+                      navigate('/login');
+                    })
+                    .catch(console.error);
+                }}
+              > Logout </button>
             </div>          
           </div>
           <ul className="infoList">
