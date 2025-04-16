@@ -35,3 +35,8 @@
     margin-bottom: 0.5rem;
     color: rgb(158, 0, 0);
 }
+
+.form-footer {
+    display: flex;
+    justify-content: space-between;
+}

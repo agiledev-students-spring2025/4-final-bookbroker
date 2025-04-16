@@ -43,7 +43,11 @@ export default function Login() {
 
             {error && <p className="error-message">{error}</p>}
 
-            <button className="form-button" type="submit"> Login </button>
+            <div className="form-footer">
+                <button className="form-button" type="submit"> Login </button>
+
+                <a href="/signup"> New User? Sign Up Here! </a>
+            </div>
         </form>
     </div>
 }
