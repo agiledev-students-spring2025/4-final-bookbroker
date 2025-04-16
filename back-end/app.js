@@ -298,4 +298,8 @@ app.post("/profile/edit", (req, res) => {
   res.status(200).json(user);
 });
 
+app.post("/logout", (req, res) => {
+  res.status(200).json({ message: "Logout: test msg" });
+});
+
 export default app;

@@ -40,6 +40,23 @@ body {
     border: 2px solid #ddd;
 }
 
+.profile-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.logout-button.logout-button {
+    border-color: rgb(146, 0, 0);
+    color: rgb(175, 0, 0);
+    width: 100%;
+}
+.logout-button.logout-button:hover {
+    background-color: rgb(175, 0, 0);
+    color: #ffffff;
+}
 
 .photoAndButton {
     display: flex;

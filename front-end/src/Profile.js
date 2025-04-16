@@ -1,5 +1,6 @@
 import './Profile.css';
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { generateUser } from './MockData.js';
 import { FaMapMarkerAlt, FaEnvelope, FaStar, FaBookOpen, FaPlus, FaAngleRight } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
@@ -116,6 +117,8 @@ const Profile = () => {
       .catch(console.error);
   };
 
+  const navigate = useNavigate();
+
   return (
     <div>
       <div className="titlebox">
@@ -125,19 +128,37 @@ const Profile = () => {
         <div className={`infoContainer ${fadeInClass.profile}`}>
           <div className="photoAndButton">
             <img className="profilePhoto" src="https://www.gravatar.com/avatar/2c7d99fe281ecd3bcd65ab915bac6dd5?s=250" alt="Profile" />
-            <Popup trigger={<button className="editProfileBtn">Edit Profile</button>}>
-              <div className="edit-popup">
-                <form onSubmit={handleProfileEdit}>
-                  <label htmlFor="username">Enter username: </label><br />
-                  <input type="text" name="username" /><br />
-                  <label htmlFor="email">Enter email: </label><br />
-                  <input type="text" name="email" /><br />
-                  <label htmlFor="location">Enter location: </label><br />
-                  <input type="text" name="location" /><br />
-                  <input type="submit" />
-                </form>
-              </div>
-            </Popup>
+
+            <div className="profile-buttons">
+              <Popup trigger={<button className="editProfileBtn">Edit Profile</button>}>
+                <div className="edit-popup">
+                  <form onSubmit={handleProfileEdit}>
+                    <label htmlFor="username">Enter username: </label><br />
+                    <input type="text" name="username" /><br />
+                    <label htmlFor="email">Enter email: </label><br />
+                    <input type="text" name="email" /><br />
+                    <label htmlFor="location">Enter location: </label><br />
+                    <input type="text" name="location" /><br />
+                    <input type="submit" />
+                  </form>
+                </div>
+              </Popup>
+
+              <button className="editProfileBtn logout-button"
+                onClick={() => {
+                  fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/logout`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                  })
+                    .then(res => res.json())
+                    .then(data => {
+                      console.log("Logout successful:", data);
+                      navigate('/login');
+                    })
+                    .catch(console.error);
+                }}
+              > Logout </button>
+            </div>          
           </div>
           <ul className="infoList">
             <li><div className="infoRow"><span className="truncate usernameText">{user.username}</span></div></li>
