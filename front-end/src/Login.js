@@ -7,14 +7,6 @@ export default function Login() {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        const password = e.target.password.value;
-        const confirmPassword = e.target.confirm.value;
-
-        if (password !== confirmPassword) {
-            setError('Passwords do not match!');
-            return;
-        }
-
         setError('');
         console.log('Form submitted successfully!');
     };
@@ -34,11 +26,6 @@ export default function Login() {
             <div className="form-pass">
                 <label htmlFor="password">Password:</label>
                 <input type="password" id="password" name="password" required />
-            </div>
-
-            <div className="form-confirm">
-                <label htmlFor="confirm">Confirm Password:</label>
-                <input type="password" id="confirm" name="confirm" required />
             </div>
 
             {error && <p className="error-message">{error}</p>}

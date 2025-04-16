@@ -4,11 +4,14 @@ import { useState } from "react";
 export default function Signup() {
     const [error, setError] = useState('');
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         const password = e.target.password.value;
         const confirmPassword = e.target.confirm.value;
+
+        const email = e.target.email.value;
+        const username = e.target.username.value;
 
         if (password !== confirmPassword) {
             setError('Passwords do not match!');
@@ -16,7 +19,26 @@ export default function Signup() {
         }
 
         setError('');
-        console.log('Form submitted successfully!');
+        
+        try {
+            const response = await fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/signup`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, username, password })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                setError(errorData.message || 'Signup failed!');
+                return;
+            }
+
+            console.log('Form submitted successfully!');
+            window.location.href = "/";
+        } catch (err) {
+            console.error('Error during signup:', err);
+            setError('An error occurred. Please try again.');
+        }
     };
 
     return <div className="login">
@@ -44,7 +66,7 @@ export default function Signup() {
             {error && <p className="error-message">{error}</p>}
 
             <div className="form-footer">
-                <button className="form-button" type="submit"> Login </button>
+                <button className="form-button" type="submit"> Signup </button>
 
                 <a href="/login"> Got an account? Login here! </a>
             </div>
