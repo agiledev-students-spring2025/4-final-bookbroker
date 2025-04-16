@@ -4,6 +4,8 @@ import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
 import { body, validationResult } from 'express-validator';
 import dotenv from 'dotenv';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 dotenv.config();
 
 import {
@@ -14,7 +16,8 @@ import {
   generateUser,
   generateMessages,
   generateConversation,
-  injectBookModel
+  injectBookModel,
+  User
 } from './Data.js';
 
 import mongoosePkg from 'mongoose';
@@ -59,12 +62,60 @@ const OfferedBook = offeredConn.model('OfferedBook', offeredBookSchema);
 
 injectBookModel(WishlistBook);
 
+
+const authMiddleware = (req, res, next) => {
+    const token = req.header('Authorization')?.split(' ')[1]; // Expecting "Bearer <token>"
+    if (!token) return res.status(401).json({ message: "Access denied. No token provided." });
+  
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      req.user = decoded; // decoded contains userId
+      next();
+    } catch (err) {
+      res.status(400).json({ message: "Invalid token" });
+    }
+};
+
 const app = express();
 
 app.use(cors()); 
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+app.post("/auth/register", async (req, res) => {
+    const { username, email, password, location } = req.body;
+    try {
+      const existingUser = await User.findOne({ email });
+      if (existingUser) return res.status(400).json({ message: "User already exists" });
+  
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const user = new User({ username, email, password: hashedPassword, location });
+      await user.save();
+  
+      res.status(201).json({ message: "User registered successfully" });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+});
+
+app.post("/auth/login", async (req, res) => {
+    const { email, password } = req.body;
+    try {
+      const user = await User.findOne({ email });
+      if (!user) return res.status(400).json({ message: "Invalid credentials" });
+  
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
+  
+      const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '2h' });
+      res.json({ token, user: { id: user._id, username: user.username } });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+});
+
+
 
 app.get("/books", async (req, res) => {
   const query = req.query.query?.toLowerCase() || "";
@@ -166,6 +217,9 @@ app.get("/users/:id", (req, res) => {
   const user = generateUser();
   res.json(user);
 });
+
+
+app.use(authMiddleware)
 
 app.get("/user", (req, res) => {
   const user = generateUser();

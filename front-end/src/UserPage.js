@@ -1,9 +1,9 @@
 import './UserPage.css'
 import { useParams} from 'react-router-dom'
 import { useState, useEffect} from 'react';
-import { generateBooks } from './MockData.js'
-import { FaMapMarkerAlt, FaEnvelope, FaStar, FaBookOpen, FaAngleRight} from 'react-icons/fa';
+import { FaMapMarkerAlt, FaEnvelope, FaStar, FaBookOpen, FaAngleRight, FaAngleLeft} from 'react-icons/fa';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 
 const UserPage = () => {
@@ -11,6 +11,7 @@ const UserPage = () => {
     const [user, setUser] = useState({});
     const [wishlistBooks, setWishlistBooks] = useState([]);
     const [offeredBooks, setOfferedBooks] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
             fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/users/${id}`)
@@ -64,11 +65,15 @@ const UserPage = () => {
         <main className={"profile"}>
 
             {/*profile info section*/}
-            
+            <div className="userpage-header">
+                <button className="iconButton backButton" onClick={() => navigate(-1)}>
+                        <FaAngleLeft />
+                </button>
+            </div>
             <div className={`infoContainer  ${fadeInClass.profile}`}>
                 <div className="photoAndButton">
                     <img className="profilePhoto" src="https://www.gravatar.com/avatar/2c7d99fe281ecd3bcd65ab915bac6dd5?s=250" alt="Profile" />
-                    <button className="editProfileBtn">Message</button>
+                    <button className="messageUserBtn">Message</button>
                 </div>
                 <ul className="infoList">
                     <li>

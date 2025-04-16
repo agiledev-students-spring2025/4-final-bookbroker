@@ -1,4 +1,30 @@
 import axios from 'axios';
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+
+mongoose.connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+})
+.then(() => console.log("Connected to MongoDB"))
+.catch(err => console.error("MongoDB connection error:", err));
+
+
+// user schema for db
+const userSchema = new mongoose.Schema({
+    username: { type: String, required: true },
+    email:    { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    location: String,
+    ratings: Number,
+    wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'WishlistBook' }],
+    offered:  [{ type: mongoose.Schema.Types.ObjectId, ref: 'OfferedBook' }]
+});
+
+const User = mongoose.model('User', userSchema);
 
 // === Google Books API Search ===
 async function searchGoogleBooks(query) {
@@ -84,5 +110,6 @@ export {
   getGenres,
   generateUser,
   generateMessages,
-  generateConversation
+  generateConversation,
+  User
 };
