@@ -10,9 +10,6 @@ dotenv.config();
 
 import {
   searchGoogleBooks,
-  getBook,
-  getBooks,
-  getGenres,
   generateUser,
   generateMessages,
   generateConversation,
@@ -47,6 +44,17 @@ const offeredBookSchema = new Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
+const conversationSchema = new Schema({
+  users: [Number]
+})
+
+const messageSchema = new Schema({
+  user: Number,
+  conversation: conversationSchema,
+  createdAt: { type: Date },
+  content: String
+})
+
 // Connect to main cluster, two DBs within same cluster
 const wishlistConn = mongoose.createConnection(process.env.MONGODB_URI + '/wishlist', {
   useNewUrlParser: true,
@@ -56,9 +64,20 @@ const offeredConn = mongoose.createConnection(process.env.MONGODB_URI + '/offere
   useNewUrlParser: true,
   useUnifiedTopology: true
 });
+const messageConn = mongoose.createConnection(process.env.MONGODB_URI + '/message', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+});
+const conversationConn = mongoose.createConnection(process.env.MONGODB_URI + '/conversations', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
 
 const WishlistBook = wishlistConn.model('WishlistBook', wishlistBookSchema);
 const OfferedBook = offeredConn.model('OfferedBook', offeredBookSchema);
+const Message = messageConn.model('Message', messageSchema)
+const Conversation = conversationConn.model('Conversation', conversationSchema)
+
 
 injectBookModel(WishlistBook);
 
@@ -85,9 +104,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post("/auth/register", async (req, res) => {
     const { username, email, password } = req.body;
-    console.log(username)
-    console.log(email)
-    console.log(password)
 
     try {
       const existingUser = await User.findOne({ email });
@@ -105,11 +121,9 @@ app.post("/auth/register", async (req, res) => {
 
 app.post("/auth/login", async (req, res) => {
     const { email, password } = req.body;
-    console.log(email);
-    console.log(password)
+
     try {
       const user = await User.findOne({ email });
-      console.log(user)
       if (!user) return res.status(400).json({ message: "Invalid credentials" });
   
       const isMatch = await bcrypt.compare(password, user.password);
@@ -162,35 +176,6 @@ app.get("/genres/:genre", async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
-});
-
-app.get("/messages", (req, res) => {
-  const currentUserId = Math.floor(Math.random() * 2500000) + 1;
-  const messages = generateMessages(currentUserId);
-  const formattedMessages = messages.map(msg => ({
-    id: msg.id,
-    otherUser: msg.otherUser.username,
-    sender: msg.senderId === currentUserId ? "You" : msg.otherUser.username,
-    receiver: msg.receiverId === currentUserId ? "You" : msg.otherUser.username,
-    content: msg.content,
-    timestamp: msg.timestamp
-  }));
-  res.json(formattedMessages);
-});
-
-app.get("/messages/:user", (req, res) => {
-  const clientUserId = Math.floor(Math.random() * 2500000) + 1;
-  const otherUser = generateUser();
-  otherUser.username = req.params.user;
-  const conversation = generateConversation(clientUserId, otherUser.id);
-  const formattedConversation = conversation.map(msg => ({
-    id: msg.id,
-    sender: msg.senderId === clientUserId ? "You" : otherUser.username,
-    receiver: msg.receiverId === clientUserId ? "You" : otherUser.username,
-    content: msg.content,
-    timestamp: msg.timestamp
-  }));
-  res.json(formattedConversation);
 });
 
 app.get("/feed", async (req, res) => {
@@ -327,5 +312,103 @@ try {
 app.post("/logout", (req, res) => {
   res.status(200).json({ message: "Logout: test msg" });
 });
+
+app.get("/messages", async (req, res) => {
+  try {
+    const userId = req.user.userId
+    
+    const conversations = await Conversation.find({
+      users: {
+        $in: userId
+      }
+    })
+
+    const formattedConversations = conversations.map(convo => {
+      const otherUser = req.user.userId == convo[0] ? convo[1] : convo[0]
+      return {
+        id: convo["_id"],
+        otherUser: otherUser,
+      }
+    })
+
+    res.json(formattedConversations)
+    
+  } catch (err) {
+    console.error("Error fetching conversations: ", err);
+    res.status(500).json({ message: "Internal server error while fetching conversations" })
+  }
+});
+
+app.get("/messages/:user", async (req, res) => {
+
+  try {
+    const conversation = await Conversation.find({
+      users: {
+        $in: [req.params.user, req.user.userId]
+      }
+    })
+
+    if (!conversation) {
+      res.status(404).json({ message: "Conversation not found" })
+    }
+
+    const messages = await Message.find({ conversation: conversation["_id"] })
+
+    const formattedMessages = messages.map(msg => {
+      // Just gets the user that isn't the current user in the conversation
+      const otherUser = conversation.users[conversation.users.indexOf(msg.user) ^ 1]
+      if (msg.user == req.user.userId) {
+        const sender = req.user.userId
+        const receiver = otherUser
+      } else {
+        const sender = otherUser
+        const receiver = req.user.userId
+      }
+
+      return { 
+        id: msg["_id"],
+        sender: sender,
+        receiver: receiver,
+        content: msg.content,
+        timestamp: msg.timestamp
+      }
+    }) 
+
+    res.json(formattedMessages)
+  }
+  catch (err) {
+    console.err("Error fetching messages: " + err)
+    res.status(500).json({ message: "Internal server error while fetching messages" })
+  }
+});
+
+app.post("/messages/:user", async (req, res) => {
+  const { content } = req.body
+
+  try {
+    const conversation = await conversationSchema.find({ 
+      users: {
+        $in: [req.params.user, req.user.userId]
+      }, 
+    })
+    if (!conversation) {
+      const newConversation = new Conversation({
+        users: [req.params.user, req.user.userId]
+      })
+      conversation = await newConversation.save()
+    }
+
+    const message = new Message({
+      timestamp: new Date(),
+      content: content,
+      conversation: conversation["_id"],
+      user: req.user.userId
+    })
+  } 
+  catch (err) {
+    console.error("Error sending message")
+    res.status(500).json({ message: "Internal server error while sending message" })
+  }
+})
 
 export default app;
