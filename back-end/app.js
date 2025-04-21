@@ -33,6 +33,7 @@ const wishlistBookSchema = new Schema({
 });
 
 const offeredBookSchema = new Schema({
+  owner: Schema.ObjectId,
   title: String,
   author: String,
   publisher: String,
@@ -205,8 +206,8 @@ app.get("/popular", async (req, res) => {
   }
 });
 
-app.get("/users/:id", (req, res) => {
-  const user = generateUser();
+app.get("/users/:id", async (req, res) => {
+  const user = await User.find({ "_id": req.params.id });
   res.json(user);
 });
 
