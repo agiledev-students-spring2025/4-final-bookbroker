@@ -25,6 +25,7 @@ const { Schema } = mongoosePkg;
 
 // Define schemas
 const wishlistBookSchema = new Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Referense a user
   title: String,
   author: String,
   publisher: String,
@@ -36,6 +37,7 @@ const wishlistBookSchema = new Schema({
 });
 
 const offeredBookSchema = new Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Referense a user
   title: String,
   author: String,
   publisher: String,
@@ -114,15 +116,14 @@ app.post("/auth/login", async (req, res) => {
   
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
-  
+      
       const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '2h' });
+      
       res.json({ token, user: { id: user._id, username: user.username } });
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
 });
-
-
 
 app.get("/books", async (req, res) => {
   const query = req.query.query?.toLowerCase() || "";
@@ -225,6 +226,11 @@ app.get("/users/:id", (req, res) => {
   res.json(user);
 });
 
+app.get("/foryou", async (req, res) => {
+    const userId = req.query.id;
+
+})
+
 //middleware for authentication, every route after this line will be checked for authentication
 //modify the front end code accordingly (see Login.js for an example)
 app.use(authMiddleware)
@@ -235,18 +241,18 @@ app.get("/user", async (req, res) => {
     res.json(user);
 });
 
-app.get("/user/wishlist", async (req, res) => {
+app.get("/user/wishlist", authMiddleware, async (req, res) => {
   try {
-    const books = await WishlistBook.find();
+    const books = await WishlistBook.find( { userId: req.user.userId });
     res.json(books);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-app.get("/user/offered", async (req, res) => {
+app.get("/user/offered", authMiddleware, async (req, res) => {
   try {
-    const books = await OfferedBook.find();
+    const books = await OfferedBook.find({ userId: req.user.userId });
     res.json(books);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -263,7 +269,8 @@ app.post("/user/add-wishlist-book",
 
     const { title, author, publisher, year, cover, isbn, genre, desc } = req.body;
     try {
-      const book = new WishlistBook({ title, author, publisher, year, cover, isbn, genre, desc });
+      // Add book associated with userId   
+      const book = new WishlistBook({ userId: req.user.userId, title, author, publisher, year, cover, isbn, genre, desc });
       await book.save();
       res.status(201).json({ message: "successfully added wishlist book" });
     } catch (err) {
@@ -281,12 +288,31 @@ app.post("/user/add-offered-book",
 
     const { title, author, publisher, year, cover, isbn, genre, desc } = req.body;
     try {
-      const book = new OfferedBook({ title, author, publisher, year, cover, isbn, genre, desc });
+      const book = new OfferedBook({ userId: req.user.userId, title, author, publisher, year, cover, isbn, genre, desc });
       await book.save();
       res.status(201).json({ message: "successfully added offered book" });
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
+});
+
+// Check if a certain book is in the user's wishlist by ISBN
+// Use authMiddleware to ensure user exists(?) idk im following the comment on line 233
+app.get("/user/wishlist/:isbn", authMiddleware, async (req, res) => {
+  console.log(req.user.userId)
+  const { isbn } = req.params;
+  try {
+    // Search for the book in the user's wishlist
+    console.log(req.user.userId)
+    const book = await WishlistBook.findOne({ userId: req.user.userId, isbn });
+    if (book) {
+      res.json({ exists: true });
+    } else {
+      res.json({ exists: false });
+    }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 app.post("/user/search-google-books", async (req, res) => {

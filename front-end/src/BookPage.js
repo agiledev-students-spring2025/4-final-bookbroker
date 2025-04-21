@@ -4,11 +4,55 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaAngleLeft } from 'react-icons/fa';
 
+
+
 const BookPage = () => {
   const { id } = useParams();
   const [book, setBook] = useState({});
   const [user, setUser] = useState({});
+  const [isInWishlist, setIsInWishlist] = useState(false);
   const navigate = useNavigate();
+
+  const addToWishlist = () => {
+    const token = localStorage.getItem('token');
+    if(!token) {
+      alert("You must be logged in to add a book to your wishlist.");
+      return;
+    }
+
+    const bookData = {
+      title: book.title,
+      author: book.author,
+      publisher: book.publisher,
+      year: book.year,
+      cover: book.cover,
+      isbn: book.isbn,
+      genre: book.genre,
+      desc: book.desc
+    }
+
+    fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/user/add-wishlist-book`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(bookData)
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.message) {
+          console.log('Book added to wishlist successfully!');
+        } else {
+          console.log('Failed to add book to wishlist.');
+        }
+      })
+      .catch(err => {
+        console.error('Error:', err);
+        alert('An error occurred. Please try again.');
+      });
+  
+  }
 
   useEffect(() => {
     fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/books/${id}`)
@@ -30,6 +74,28 @@ const BookPage = () => {
         setBook({});
       });
   }, [id]);
+
+  useEffect(() => {
+    if(book.isbn){
+      const token = localStorage.getItem('token');
+      if(!token) {
+        alert("You must be logged in to add a book to your wishlist.");
+        return;
+      }
+      // Check if book is in the user's wishlist
+      fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/user/wishlist/${book.isbn}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      }).then(res => res.json())
+      .then(data => {
+        setIsInWishlist(data.exists); // directly set state to true / false
+      })
+      .catch(err => {
+        console.error('Error checking wishlist status :', err);
+      });
+    }
+  }, [book.isbn]);
 
   return (
     <main className="BookPage page-slide-in">
@@ -59,7 +125,12 @@ const BookPage = () => {
       </div>
 
       <div className="book-page-actions">
-        <button className="book-action-btn wishlist-btn">Add to Wishlist</button>
+        {/* Display button only if book is not yet in user's wishlist */}
+        {isInWishlist ? (
+          <p >Already in Wishlist</p>
+        ) : (
+          <button className="book-action-btn wishlist-btn" onClick={addToWishlist}>Add to Wishlist</button>
+        )}
         <button className="book-action-btn contact-btn">Contact Owner</button>
       </div>
 
