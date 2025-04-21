@@ -9,6 +9,8 @@ const BookPage = () => {
   const [book, setBook] = useState({});
   const [user, setUser] = useState({});
   const navigate = useNavigate();
+  const token = localStorage.getItem('token')
+  const userId = localStorage.getItem("userId")
 
   useEffect(() => {
     fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/books/${id}`)
@@ -18,7 +20,10 @@ const BookPage = () => {
         if (data.userid) {
           fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/users/${data.userid}`)
             .then(res => res.json())
-            .then(setUser)
+            .then((data) => {
+              setUser(data)
+              console.log(data)
+             })
             .catch(err => {
               console.log('Failed to fetch user', err);
               setUser({});
@@ -30,6 +35,17 @@ const BookPage = () => {
         setBook({});
       });
   }, [id]);
+
+  async function openConversationWithOwner() {
+    fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/messages/${user["_id"]}`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    })
+      .then(res => console.log(res))
+    
+  }
 
   return (
     <main className="BookPage page-slide-in">
@@ -60,7 +76,7 @@ const BookPage = () => {
 
       <div className="book-page-actions">
         <button className="book-action-btn wishlist-btn">Add to Wishlist</button>
-        <button className="book-action-btn contact-btn">Contact Owner</button>
+        <button className="book-action-btn contact-btn" onClick={openConversationWithOwner}>Contact Owner</button>
       </div>
 
       <div className="book-description-section">
