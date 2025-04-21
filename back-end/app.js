@@ -45,11 +45,11 @@ const offeredBookSchema = new Schema({
 });
 
 const conversationSchema = new Schema({
-  users: [Number]
+  users: [Schema.ObjectId]
 })
 
 const messageSchema = new Schema({
-  user: Number,
+  user: Schema.ObjectId,
   conversation: conversationSchema,
   createdAt: { type: Date },
   content: String
@@ -332,7 +332,7 @@ app.get("/messages", async (req, res) => {
     })
 
     res.json(formattedConversations)
-    
+
   } catch (err) {
     console.error("Error fetching conversations: ", err);
     res.status(500).json({ message: "Internal server error while fetching conversations" })

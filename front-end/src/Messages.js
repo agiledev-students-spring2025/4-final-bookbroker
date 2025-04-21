@@ -4,9 +4,15 @@ import { Link } from 'react-router-dom';
 
 
 const Messages = () => {
+    const token = localStorage.getItem('token')
+    const userId = localStorage.getItem('userId')
     const [messages, setMessages] = useState([]);
     useEffect(() => {
-        fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/messages`)
+        fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/messages`, {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        })
         .then(res => res.json())
         .then(data => {
             console.log(data)
