@@ -119,7 +119,7 @@ const UserPage = () => {
                         </li>
                         ))
                     ) : (
-                        <li>Loading wishlist...</li>
+                        <li>No items in wishlist</li>
                     )}
                 </ul>
             </div>
@@ -141,7 +141,7 @@ const UserPage = () => {
                             </li>
                         ))
                     ) : (
-                        <li>Loading offerings...</li>
+                        <li>No open offerings</li>
                     )}
                 </ul>
             </div>
