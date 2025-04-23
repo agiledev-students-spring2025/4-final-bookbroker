@@ -26,11 +26,13 @@ const Messages = () => {
 
     return (
       <main>
-        <h2 className='font-bold text-center p-4'>Messages</h2>
+        <div className="titlebox mb-4">
+            <h1 className="title"> Messages </h1>
+        </div>
 
-        <ul className='space-y-4'>
+        <ul className='messages-container space-y-4'>
         {messages.map((message, index) => (
-            <li key={index} className='border-solid border-2 border-black p-2 '>
+            <li key={index} className='infoContainer fade-in'>
                 {/* Clickable dynamic link to new page */}
                 <Link to={`/messages/${message.otherUser}`}>
                     {/* Div around all content used to allign time stamp to the right */}
