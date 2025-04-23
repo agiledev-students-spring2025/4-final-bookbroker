@@ -153,10 +153,14 @@ app.get("/books", async (req, res) => {
 app.get("/books/:id", async (req, res) => {
   try {
     const book = await OfferedBook.findById(req.params.id);
-    if (!book) return res.status(404).json({ error: 'Book not found' });
-    res.json(book);
+    const owner = await User.findById(book.owner)
+    const result = { ...book["_doc"] }
+    // Overwrite owner to usable values
+    result.owner = { id: owner["_id"], username: owner.username }
+    if (!result) return res.status(404).json({ error: 'Book not found' });
+    res.json(result);
   } catch (err) {
-    res.status(404).json({ error: 'Book not found' });
+    res.status(404).json({ error: 'Book not found: ' + err.message });
   }
 });
 
@@ -207,8 +211,12 @@ app.get("/popular", async (req, res) => {
 });
 
 app.get("/users/:id", async (req, res) => {
-  const user = await User.find({ "_id": req.params.id });
-  res.json(user);
+  try {
+    const user = await User.find({ "_id": req.params.id });
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ error: "Error fetching user" })
+  }
 });
 
 //middleware for authentication, every route after this line will be checked for authentication
@@ -217,8 +225,12 @@ app.use(authMiddleware)
 
 app.get("/user", async (req, res) => {
     const userId = req.query.id;
-    const user = await User.findById(userId);
-    res.json(user);
+    try {
+      const user = await User.findById(userId);
+      res.json(user);
+    } catch (err) {
+      res.status(500).json({ error: err.message })
+    }
 });
 
 app.get("/user/wishlist", async (req, res) => {
@@ -261,13 +273,14 @@ app.post("/user/add-offered-book",
   body('title').notEmpty(),
   body('author').notEmpty(),
   body('isbn').notEmpty(),
+  body('owner').notEmpty(),
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
-    const { title, author, publisher, year, cover, isbn, genre, desc } = req.body;
+    const { title, author, publisher, year, cover, isbn, genre, desc, owner } = req.body;
     try {
-      const book = new OfferedBook({ title, author, publisher, year, cover, isbn, genre, desc });
+      const book = new OfferedBook({ title, author, publisher, year, cover, isbn, genre, desc, owner });
       await book.save();
       res.status(201).json({ message: "successfully added offered book" });
     } catch (err) {
@@ -387,7 +400,7 @@ app.post("/messages/:user", async (req, res) => {
   const { content } = req.body
 
   try {
-    const conversation = await conversationSchema.find({ 
+    const conversation = await Conversation.find({ 
       users: {
         $in: [req.params.user, req.user.userId]
       }, 
@@ -407,7 +420,7 @@ app.post("/messages/:user", async (req, res) => {
     })
   } 
   catch (err) {
-    console.error("Error sending message")
+    console.error("Error sending message: ", err.message)
     res.status(500).json({ message: "Internal server error while sending message" })
   }
 })

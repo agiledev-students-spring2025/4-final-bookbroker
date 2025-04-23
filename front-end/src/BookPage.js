@@ -7,28 +7,16 @@ import { FaAngleLeft } from 'react-icons/fa';
 const BookPage = () => {
   const { id } = useParams();
   const [book, setBook] = useState({});
-  const [user, setUser] = useState({});
   const navigate = useNavigate();
   const token = localStorage.getItem('token')
-  const userId = localStorage.getItem("userId")
+  // const userId = localStorage.getItem("userId")
 
   useEffect(() => {
     fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/books/${id}`)
       .then(res => res.json())
       .then(data => {
         setBook(data);
-        if (data.userid) {
-          fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/users/${data.userid}`)
-            .then(res => res.json())
-            .then((data) => {
-              setUser(data)
-              console.log(data)
-             })
-            .catch(err => {
-              console.log('Failed to fetch user', err);
-              setUser({});
-            });
-        }
+        console.log(data)
       })
       .catch(err => {
         console.error('Failed to fetch book:', err);
@@ -37,11 +25,12 @@ const BookPage = () => {
   }, [id]);
 
   async function openConversationWithOwner() {
-    fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/messages/${user["_id"]}`, {
+    fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/messages/${book.owner?.id}`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${token}`
-      }
+      },
+      body: JSON.stringify({ content: `Hey, I'm interesting in your listing for ${book.title}` })
     })
       .then(res => console.log(res))
     
@@ -67,8 +56,8 @@ const BookPage = () => {
           </h3>
           <h2 className="book-owner">
             Offered by:
-            <Link to={`/users/${book.userid}`}>
-              {user.username || "[NO USER]"}
+            <Link to={`/users/${book.owner?.id}`}>
+              {book.owner?.username || "[NO USER]"}
             </Link>
           </h2>
         </div>

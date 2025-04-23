@@ -103,7 +103,10 @@ const fetchUserData = () => {
 
   const handleAddOffering = (e) => {
     e.preventDefault();
-    if (!selectedBookOffer) return;
+    if (!selectedBookOffer) return;    
+    selectedBookOffer.owner = userId
+    console.log(selectedBookOffer)
+
 
     fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/user/add-offered-book`, {
       method: 'POST',
