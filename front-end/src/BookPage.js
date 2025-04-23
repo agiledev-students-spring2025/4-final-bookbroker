@@ -1,10 +1,7 @@
 import './BookPage.css';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import { FaAngleLeft } from 'react-icons/fa';
-
-
 
 const BookPage = () => {
   const { id } = useParams();
@@ -12,10 +9,11 @@ const BookPage = () => {
   const [user, setUser] = useState({});
   const [isInWishlist, setIsInWishlist] = useState(false);
   const navigate = useNavigate();
+  const token = localStorage.getItem('token');
+  const userId = localStorage.getItem("userId");
 
   const addToWishlist = () => {
-    const token = localStorage.getItem('token');
-    if(!token) {
+    if (!token) {
       alert("You must be logged in to add a book to your wishlist.");
       return;
     }
@@ -29,7 +27,7 @@ const BookPage = () => {
       isbn: book.isbn,
       genre: book.genre,
       desc: book.desc
-    }
+    };
 
     fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/user/add-wishlist-book`, {
       method: 'POST',
@@ -43,6 +41,7 @@ const BookPage = () => {
       .then(data => {
         if (data.message) {
           console.log('Book added to wishlist successfully!');
+          setIsInWishlist(true);
         } else {
           console.log('Failed to add book to wishlist.');
         }
@@ -51,8 +50,32 @@ const BookPage = () => {
         console.error('Error:', err);
         alert('An error occurred. Please try again.');
       });
-  
-  }
+  };
+
+  const openConversationWithOwner = () => {
+    if (!token) {
+      alert("You must be logged in to contact the owner.");
+      return;
+    }
+
+    fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/messages/${user["_id"]}`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    })
+      .then(res => {
+        if (res.ok) {
+          console.log("Conversation opened or exists");
+          navigate("/messages"); // optionally redirect
+        } else {
+          console.error("Failed to open conversation");
+        }
+      })
+      .catch(err => {
+        console.error("Error opening conversation:", err);
+      });
+  };
 
   useEffect(() => {
     fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/books/${id}`)
@@ -62,7 +85,7 @@ const BookPage = () => {
         if (data.userid) {
           fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/users/${data.userid}`)
             .then(res => res.json())
-            .then(setUser)
+            .then(data => setUser(data))
             .catch(err => {
               console.log('Failed to fetch user', err);
               setUser({});
@@ -76,26 +99,19 @@ const BookPage = () => {
   }, [id]);
 
   useEffect(() => {
-    if(book.isbn){
-      const token = localStorage.getItem('token');
-      if(!token) {
-        alert("You must be logged in to add a book to your wishlist.");
-        return;
-      }
-      // Check if book is in the user's wishlist
+    if (book.isbn && token) {
       fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/user/wishlist/${book.isbn}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
-      }).then(res => res.json())
-      .then(data => {
-        setIsInWishlist(data.exists); // directly set state to true / false
       })
-      .catch(err => {
-        console.error('Error checking wishlist status :', err);
-      });
+        .then(res => res.json())
+        .then(data => setIsInWishlist(data.exists))
+        .catch(err => {
+          console.error('Error checking wishlist status:', err);
+        });
     }
-  }, [book.isbn]);
+  }, [book.isbn, token]);
 
   return (
     <main className="BookPage page-slide-in">
@@ -125,13 +141,16 @@ const BookPage = () => {
       </div>
 
       <div className="book-page-actions">
-        {/* Display button only if book is not yet in user's wishlist */}
         {isInWishlist ? (
-          <p >Already in Wishlist</p>
+          <p>Already in Wishlist</p>
         ) : (
-          <button className="book-action-btn wishlist-btn" onClick={addToWishlist}>Add to Wishlist</button>
+          <button className="book-action-btn wishlist-btn" onClick={addToWishlist}>
+            Add to Wishlist
+          </button>
         )}
-        <button className="book-action-btn contact-btn">Contact Owner</button>
+        <button className="book-action-btn contact-btn" onClick={openConversationWithOwner}>
+          Contact Owner
+        </button>
       </div>
 
       <div className="book-description-section">
