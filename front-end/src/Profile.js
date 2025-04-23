@@ -36,6 +36,8 @@ const Profile = () => {
   const [searchTextOffer, setSearchTextOffer] = useState("");
   const [searchResultsOffer, setSearchResultsOffer] = useState([]);
   const [selectedBookOffer, setSelectedBookOffer] = useState(null);
+  const [location, setLocation] = useState('');
+  const [customLocation, setCustomLocation] = useState('');
   const token = localStorage.getItem('token');
   const userId = localStorage.getItem('userId')
 
@@ -121,13 +123,13 @@ const fetchUserData = () => {
       .catch(console.error);
   };
 
-  const handleProfileEdit = (e) => {
+  const handleProfileEdit = (e, close) => {
     e.preventDefault();
     const username = e.target.username.value;
     const email = e.target.email.value;
-    const location = e.target.location.value;
+    const finalLocation = location=='Other' ? customLocation : location;
 
-    const data = { user: { username, email, location } };
+    const data = { user: { username, email, location: finalLocation } };
 
     fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/user/edit`, {
       method: 'POST',
@@ -138,6 +140,7 @@ const fetchUserData = () => {
       .then(data => {
         console.log("new user data:", data.user);
         fetchUserData();
+        close();
       })
       .catch(console.error);
   };
@@ -178,30 +181,59 @@ const fetchUserData = () => {
             <img className="profilePhoto" src="https://www.gravatar.com/avatar/2c7d99fe281ecd3bcd65ab915bac6dd5?s=250" alt="Profile" />
 
             <div className="profile-buttons">
-              <Popup
+            <Popup
               trigger={<button className="editProfileBtn">Edit Profile</button>}
-              modal>
-                <div className="edit-popup">
-                <form onSubmit={handleProfileEdit}>
-                <div className="form-group">
+              modal
+            >
+            {(close) => (
+              <div className="edit-popup">
+                <form onSubmit={(e) => handleProfileEdit(e, close)}>
+                  <div className="form-group">
                     <label htmlFor="username">Enter username:</label>
                     <input type="text" name="username" id="username" />
-                </div>
+                  </div>
 
-                <div className="form-group">
+                  <div className="form-group">
                     <label htmlFor="email">Enter email:</label>
                     <input type="text" name="email" id="email" />
-                </div>
+                  </div>
 
-                <div className="form-group">
-                    <label htmlFor="location">Enter location:</label>
-                    <input type="text" name="location" id="location" />
-                </div>
+                  <div className="form-group">
+                    <label htmlFor="location">Select city:</label>
+                    <select
+                      id="location"
+                      name="location"
+                      value={location}
+                      onChange={(e) => setLocation(e.target.value)}
+                    >
+                      {/* Your city options */}
+                      <option value="">--Choose a city--</option>
+                      <option value="New York">New York, NY</option>
+                      <option value="Los Angeles">Los Angeles, CA</option>
+                      {/* ... all other cities ... */}
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
 
-                <button type="submit" className="editProfileBtn">Submit</button>
+                  {location === 'Other' && (
+                    <div className="edit-profile-custom-location">
+                      <label htmlFor="customLocation">Enter your city:</label>
+                      <input
+                        type="text"
+                        id="customLocation"
+                        name="customLocation"
+                        value={customLocation}
+                        onChange={(e) => setCustomLocation(e.target.value)}
+                        required
+                      />
+                    </div>
+                  )}
+
+                  <button type="submit" className="editProfileBtn">Submit</button>
                 </form>
-                </div>
-              </Popup>
+              </div>
+            )}
+          </Popup>
 
               <button className="editProfileBtn logout-button"
                 onClick={handleLogout}
