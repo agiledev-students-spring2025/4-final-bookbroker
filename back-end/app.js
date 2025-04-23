@@ -84,7 +84,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post("/auth/register", async (req, res) => {
-    const { username, email, password } = req.body;
+    const { username, email, password, location} = req.body;
     console.log(username)
     console.log(email)
     console.log(password)
@@ -94,7 +94,7 @@ app.post("/auth/register", async (req, res) => {
       if (existingUser) return res.status(400).json({ message: "User already exists" });
   
       const hashedPassword = await bcrypt.hash(password, 10);
-      const user = new User({ username, email, password: hashedPassword, location: null, ratings: 5});
+      const user = new User({ username, email, password: hashedPassword, location: location, ratings: 5});
       await user.save();
   
       res.status(201).json({ message: "User registered successfully" });
