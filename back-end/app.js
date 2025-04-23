@@ -237,10 +237,31 @@ app.get("/user/wishlist", authMiddleware, async (req, res) => {
 
 app.get("/user/offered", authMiddleware, async (req, res) => {
   try {
-    const books = await OfferedBook.find({ userId: req.user.userId });
+    const books = await OfferedBook.find({ owner: req.user.userId  });
     res.json(books);
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+app.get("/users/:id/wishlist", authMiddleware, async (req, res) => {
+  try {
+    const books = await WishlistBook.find({ userId: req.params.id });
+    res.json(books);
+  } catch (err) {
+    console.error("Error fetching wishlist for user:", err);
+    res.status(500).json({ error: "Failed to fetch wishlist" });
+  }
+});
+
+// Get public offered books for a specific user
+app.get("/users/:id/offered", authMiddleware, async (req, res) => {
+  try {
+    const books = await OfferedBook.find({ owner: req.params.id }); 
+    res.json(books);
+  } catch (err) {
+    console.error("Error fetching offered books for user:", err);
+    res.status(500).json({ error: "Failed to fetch offered books" });
   }
 });
 
@@ -273,7 +294,8 @@ app.post("/user/add-offered-book",
 
     const { title, author, publisher, year, cover, isbn, genre, desc } = req.body;
     try {
-      const book = new OfferedBook({ userId: req.user.userId, title, author, publisher, year, cover, isbn, genre, desc });
+      const book = new OfferedBook({ owner: req.user.userId,  // ✅ correct field
+        title, author, publisher, year, cover, isbn, genre, desc});
       await book.save();
       res.status(201).json({ message: "successfully added offered book" });
     } catch (err) {
