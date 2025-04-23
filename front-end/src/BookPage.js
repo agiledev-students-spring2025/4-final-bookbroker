@@ -28,6 +28,7 @@ const BookPage = () => {
     fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/messages/${book.owner?.id}`, {
       method: "POST",
       headers: {
+        "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
       },
       body: JSON.stringify({ content: `Hey, I'm interesting in your listing for ${book.title}` })
