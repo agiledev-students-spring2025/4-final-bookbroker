@@ -10,9 +10,6 @@ dotenv.config();
 
 import {
   searchGoogleBooks,
-  getBook,
-  getBooks,
-  getGenres,
   generateUser,
   generateMessages,
   generateConversation,
@@ -25,6 +22,7 @@ const { Schema } = mongoosePkg;
 
 // Define schemas
 const wishlistBookSchema = new Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Referense a user
   title: String,
   author: String,
   publisher: String,
@@ -36,6 +34,7 @@ const wishlistBookSchema = new Schema({
 });
 
 const offeredBookSchema = new Schema({
+  owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   title: String,
   author: String,
   publisher: String,
@@ -47,6 +46,17 @@ const offeredBookSchema = new Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
+const conversationSchema = new Schema({
+  users: [Schema.ObjectId]
+})
+
+const messageSchema = new Schema({
+  user: Schema.ObjectId,
+  conversation: conversationSchema,
+  createdAt: { type: Date },
+  content: String
+})
+
 // Connect to main cluster, two DBs within same cluster
 const wishlistConn = mongoose.createConnection(process.env.MONGODB_URI + '/wishlist', {
   useNewUrlParser: true,
@@ -56,9 +66,20 @@ const offeredConn = mongoose.createConnection(process.env.MONGODB_URI + '/offere
   useNewUrlParser: true,
   useUnifiedTopology: true
 });
+const messageConn = mongoose.createConnection(process.env.MONGODB_URI + '/message', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+});
+const conversationConn = mongoose.createConnection(process.env.MONGODB_URI + '/conversations', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
 
 const WishlistBook = wishlistConn.model('WishlistBook', wishlistBookSchema);
 const OfferedBook = offeredConn.model('OfferedBook', offeredBookSchema);
+const Message = messageConn.model('Message', messageSchema)
+const Conversation = conversationConn.model('Conversation', conversationSchema)
+
 
 injectBookModel(WishlistBook);
 
@@ -84,10 +105,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post("/auth/register", async (req, res) => {
+  
     const { username, email, password, location} = req.body;
-    console.log(username)
-    console.log(email)
-    console.log(password)
 
     try {
       const existingUser = await User.findOne({ email });
@@ -105,24 +124,21 @@ app.post("/auth/register", async (req, res) => {
 
 app.post("/auth/login", async (req, res) => {
     const { email, password } = req.body;
-    console.log(email);
-    console.log(password)
+
     try {
       const user = await User.findOne({ email });
-      console.log(user)
       if (!user) return res.status(400).json({ message: "Invalid credentials" });
   
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
-  
+      
       const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '2h' });
+      
       res.json({ token, user: { id: user._id, username: user.username } });
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
 });
-
-
 
 app.get("/books", async (req, res) => {
   const query = req.query.query?.toLowerCase() || "";
@@ -164,35 +180,6 @@ app.get("/genres/:genre", async (req, res) => {
   }
 });
 
-app.get("/messages", (req, res) => {
-  const currentUserId = Math.floor(Math.random() * 2500000) + 1;
-  const messages = generateMessages(currentUserId);
-  const formattedMessages = messages.map(msg => ({
-    id: msg.id,
-    otherUser: msg.otherUser.username,
-    sender: msg.senderId === currentUserId ? "You" : msg.otherUser.username,
-    receiver: msg.receiverId === currentUserId ? "You" : msg.otherUser.username,
-    content: msg.content,
-    timestamp: msg.timestamp
-  }));
-  res.json(formattedMessages);
-});
-
-app.get("/messages/:user", (req, res) => {
-  const clientUserId = Math.floor(Math.random() * 2500000) + 1;
-  const otherUser = generateUser();
-  otherUser.username = req.params.user;
-  const conversation = generateConversation(clientUserId, otherUser.id);
-  const formattedConversation = conversation.map(msg => ({
-    id: msg.id,
-    sender: msg.senderId === clientUserId ? "You" : otherUser.username,
-    receiver: msg.receiverId === clientUserId ? "You" : otherUser.username,
-    content: msg.content,
-    timestamp: msg.timestamp
-  }));
-  res.json(formattedConversation);
-});
-
 app.get("/feed", async (req, res) => {
   try {
     const books = await OfferedBook.find().sort({ createdAt: -1 }).limit(20);
@@ -220,10 +207,15 @@ app.get("/popular", async (req, res) => {
   }
 });
 
-app.get("/users/:id", (req, res) => {
-  const user = generateUser();
+app.get("/users/:id", async (req, res) => {
+  const user = await User.find({ "_id": req.params.id });
   res.json(user);
 });
+
+app.get("/foryou", async (req, res) => {
+    const userId = req.query.id;
+
+})
 
 //middleware for authentication, every route after this line will be checked for authentication
 //modify the front end code accordingly (see Login.js for an example)
@@ -235,21 +227,42 @@ app.get("/user", async (req, res) => {
     res.json(user);
 });
 
-app.get("/user/wishlist", async (req, res) => {
+app.get("/user/wishlist", authMiddleware, async (req, res) => {
   try {
-    const books = await WishlistBook.find();
+    const books = await WishlistBook.find( { userId: req.user.userId });
     res.json(books);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-app.get("/user/offered", async (req, res) => {
+app.get("/user/offered", authMiddleware, async (req, res) => {
   try {
-    const books = await OfferedBook.find();
+    const books = await OfferedBook.find({ owner: req.user.userId  });
     res.json(books);
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+app.get("/users/:id/wishlist", authMiddleware, async (req, res) => {
+  try {
+    const books = await WishlistBook.find({ userId: req.params.id });
+    res.json(books);
+  } catch (err) {
+    console.error("Error fetching wishlist for user:", err);
+    res.status(500).json({ error: "Failed to fetch wishlist" });
+  }
+});
+
+// Get public offered books for a specific user
+app.get("/users/:id/offered", authMiddleware, async (req, res) => {
+  try {
+    const books = await OfferedBook.find({ owner: req.params.id }); 
+    res.json(books);
+  } catch (err) {
+    console.error("Error fetching offered books for user:", err);
+    res.status(500).json({ error: "Failed to fetch offered books" });
   }
 });
 
@@ -263,7 +276,8 @@ app.post("/user/add-wishlist-book",
 
     const { title, author, publisher, year, cover, isbn, genre, desc } = req.body;
     try {
-      const book = new WishlistBook({ title, author, publisher, year, cover, isbn, genre, desc });
+      // Add book associated with userId   
+      const book = new WishlistBook({ userId: req.user.userId, title, author, publisher, year, cover, isbn, genre, desc });
       await book.save();
       res.status(201).json({ message: "successfully added wishlist book" });
     } catch (err) {
@@ -281,12 +295,32 @@ app.post("/user/add-offered-book",
 
     const { title, author, publisher, year, cover, isbn, genre, desc } = req.body;
     try {
-      const book = new OfferedBook({ title, author, publisher, year, cover, isbn, genre, desc });
+      const book = new OfferedBook({ owner: req.user.userId,  // ✅ correct field
+        title, author, publisher, year, cover, isbn, genre, desc});
       await book.save();
       res.status(201).json({ message: "successfully added offered book" });
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
+});
+
+// Check if a certain book is in the user's wishlist by ISBN
+// Use authMiddleware to ensure user exists(?) idk im following the comment on line 233
+app.get("/user/wishlist/:isbn", authMiddleware, async (req, res) => {
+  console.log(req.user.userId)
+  const { isbn } = req.params;
+  try {
+    // Search for the book in the user's wishlist
+    console.log(req.user.userId)
+    const book = await WishlistBook.findOne({ userId: req.user.userId, isbn });
+    if (book) {
+      res.json({ exists: true });
+    } else {
+      res.json({ exists: false });
+    }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 app.post("/user/search-google-books", async (req, res) => {
@@ -327,5 +361,103 @@ try {
 app.post("/logout", (req, res) => {
   res.status(200).json({ message: "Logout: test msg" });
 });
+
+app.get("/messages", async (req, res) => {
+  try {
+    const userId = req.user.userId
+    
+    const conversations = await Conversation.find({
+      users: {
+        $in: userId
+      }
+    })
+
+    const formattedConversations = conversations.map(convo => {
+      const otherUser = req.user.userId == convo[0] ? convo[1] : convo[0]
+      return {
+        id: convo["_id"],
+        otherUser: otherUser,
+      }
+    })
+
+    res.json(formattedConversations)
+
+  } catch (err) {
+    console.error("Error fetching conversations: ", err);
+    res.status(500).json({ message: "Internal server error while fetching conversations" })
+  }
+});
+
+app.get("/messages/:user", async (req, res) => {
+
+  try {
+    const conversation = await Conversation.find({
+      users: {
+        $in: [req.params.user, req.user.userId]
+      }
+    })
+
+    if (!conversation) {
+      res.status(404).json({ message: "Conversation not found" })
+    }
+
+    const messages = await Message.find({ conversation: conversation["_id"] })
+
+    const formattedMessages = messages.map(msg => {
+      // Just gets the user that isn't the current user in the conversation
+      const otherUser = conversation.users[conversation.users.indexOf(msg.user) ^ 1]
+      if (msg.user == req.user.userId) {
+        const sender = req.user.userId
+        const receiver = otherUser
+      } else {
+        const sender = otherUser
+        const receiver = req.user.userId
+      }
+
+      return { 
+        id: msg["_id"],
+        sender: sender,
+        receiver: receiver,
+        content: msg.content,
+        timestamp: msg.timestamp
+      }
+    }) 
+
+    res.json(formattedMessages)
+  }
+  catch (err) {
+    console.err("Error fetching messages: " + err)
+    res.status(500).json({ message: "Internal server error while fetching messages" })
+  }
+});
+
+app.post("/messages/:user", async (req, res) => {
+  const { content } = req.body
+
+  try {
+    const conversation = await conversationSchema.find({ 
+      users: {
+        $in: [req.params.user, req.user.userId]
+      }, 
+    })
+    if (!conversation) {
+      const newConversation = new Conversation({
+        users: [req.params.user, req.user.userId]
+      })
+      conversation = await newConversation.save()
+    }
+
+    const message = new Message({
+      timestamp: new Date(),
+      content: content,
+      conversation: conversation["_id"],
+      user: req.user.userId
+    })
+  } 
+  catch (err) {
+    console.error("Error sending message")
+    res.status(500).json({ message: "Internal server error while sending message" })
+  }
+})
 
 export default app;
