@@ -19,6 +19,12 @@ Create a file at front-end/.env and add the following line to the file:
 REACT_APP_SERVER_ADDRESS="http://localhost:5000"
 ```
 
+Create a file at back-end/.env and add the following line to the file:
+```
+MONGODB_URI=mongodb+srv://rain:rain12345678@bookbroker.nelw2as.mongodb.net/?retryWrites=true&w=majority&appName=BookBroker
+JWT_SECRET="MYSECRET"
+```
+
 ### Frontend
 Navigate to the frontend directory and run the react app
 ```
