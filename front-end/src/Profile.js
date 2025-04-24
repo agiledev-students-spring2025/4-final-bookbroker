@@ -36,6 +36,22 @@ const Profile = () => {
   const [searchTextOffer, setSearchTextOffer] = useState("");
   const [searchResultsOffer, setSearchResultsOffer] = useState([]);
   const [selectedBookOffer, setSelectedBookOffer] = useState(null);
+  const [location, setLocation] = useState('');
+  const [customLocation, setCustomLocation] = useState('');
+  const token = localStorage.getItem('token');
+  const userId = localStorage.getItem('userId')
+
+
+const fetchUserData = () => {
+    fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/user?id=${userId}`, {
+        headers: {
+        "Authorization": `Bearer ${token}`
+        }
+    })
+        .then(res => res.json())
+        .then(data => setUser(data))
+        .catch(err => console.log('Failed to fetch user:', err));
+};
 
   useEffect(() => {
     setTimeout(() => setFadeInClass(prev => ({ ...prev, profile: 'fade-in' })), 200);
@@ -44,16 +60,24 @@ const Profile = () => {
   }, []);
 
   useEffect(() => {
-    setUser(generateUser());
+    fetchUserData();
   }, []);
 
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/user/wishlist`)
+    fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/user/wishlist`, {
+        headers: {
+        'Authorization': `Bearer ${token}`
+        }
+    })
       .then(res => res.json())
       .then(data => setWishlistBooks(data))
       .catch(err => console.log("Failed to fetch wishlist:", err));
 
-    fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/user/offered`)
+    fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/user/offered`, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
       .then(res => res.json())
       .then(data => setOfferedBooks(data))
       .catch(err => console.log("Failed to fetch offerings", err));
@@ -65,7 +89,7 @@ const Profile = () => {
 
     fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/user/add-wishlist-book`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},
       body: JSON.stringify(selectedBook)
     })
       .then(res => res.json())
@@ -85,7 +109,7 @@ const Profile = () => {
 
     fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/user/add-offered-book`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},
       body: JSON.stringify(selectedBookOffer)
     })
       .then(res => res.json())
@@ -99,23 +123,50 @@ const Profile = () => {
       .catch(console.error);
   };
 
-  const handleProfileEdit = (e) => {
+  const handleProfileEdit = (e, close) => {
     e.preventDefault();
     const username = e.target.username.value;
     const email = e.target.email.value;
-    const location = e.target.location.value;
+    const finalLocation = location=='Other' ? customLocation : location;
 
-    const data = { user: { username, email, location } };
+    const data = { user: { username, email, location: finalLocation } };
 
-    fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/profile/edit`, {
+    fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/user/edit`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},
       body: JSON.stringify(data)
     })
       .then(res => res.json())
-      .then(data => console.log("new user data:", data.user))
+      .then(data => {
+        console.log("new user data:", data.user);
+        fetchUserData();
+        close();
+      })
       .catch(console.error);
   };
+
+  const handleLogout = () => {
+    fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/logout`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    })
+      .then(res => res.json())
+      .then(data => {
+        console.log("Logout success:", data);
+  
+        //Remove tokens and user info from localStorage
+        localStorage.removeItem('token');
+        localStorage.removeItem('username');
+        localStorage.removeItem('userId');
+  
+        //Redirect to login
+        window.location.href = '/login';
+      })
+      .catch(err => {
+        console.error("Logout error:", err);
+      });
+  };
+  
 
   const navigate = useNavigate();
 
@@ -130,40 +181,69 @@ const Profile = () => {
             <img className="profilePhoto" src="https://www.gravatar.com/avatar/2c7d99fe281ecd3bcd65ab915bac6dd5?s=250" alt="Profile" />
 
             <div className="profile-buttons">
-              <Popup trigger={<button className="editProfileBtn">Edit Profile</button>}>
-                <div className="edit-popup">
-                  <form onSubmit={handleProfileEdit}>
-                    <label htmlFor="username">Enter username: </label><br />
-                    <input type="text" name="username" /><br />
-                    <label htmlFor="email">Enter email: </label><br />
-                    <input type="text" name="email" /><br />
-                    <label htmlFor="location">Enter location: </label><br />
-                    <input type="text" name="location" /><br />
-                    <input type="submit" />
-                  </form>
-                </div>
-              </Popup>
+            <Popup
+              trigger={<button className="editProfileBtn">Edit Profile</button>}
+              modal
+            >
+            {(close) => (
+              <div className="edit-popup">
+                <form onSubmit={(e) => handleProfileEdit(e, close)}>
+                  <div className="form-group">
+                    <label htmlFor="username">Enter username:</label>
+                    <input type="text" name="username" id="username" />
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="email">Enter email:</label>
+                    <input type="text" name="email" id="email" />
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="location">Select city:</label>
+                    <select
+                      id="location"
+                      name="location"
+                      value={location}
+                      onChange={(e) => setLocation(e.target.value)}
+                    >
+                      {/* Your city options */}
+                      <option value="">--Choose a city--</option>
+                      <option value="New York">New York, NY</option>
+                      <option value="Los Angeles">Los Angeles, CA</option>
+                      {/* ... all other cities ... */}
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+
+                  {location === 'Other' && (
+                    <div className="edit-profile-custom-location">
+                      <label htmlFor="customLocation">Enter your city:</label>
+                      <input
+                        type="text"
+                        id="customLocation"
+                        name="customLocation"
+                        value={customLocation}
+                        onChange={(e) => setCustomLocation(e.target.value)}
+                        required
+                      />
+                    </div>
+                  )}
+
+                  <button type="submit" className="editProfileBtn">Submit</button>
+                </form>
+              </div>
+            )}
+          </Popup>
 
               <button className="editProfileBtn logout-button"
-                onClick={() => {
-                  fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/logout`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                  })
-                    .then(res => res.json())
-                    .then(data => {
-                      console.log("Logout successful:", data);
-                      navigate('/login');
-                    })
-                    .catch(console.error);
-                }}
+                onClick={handleLogout}
               > Logout </button>
             </div>          
           </div>
           <ul className="infoList">
             <li><div className="infoRow"><span className="truncate usernameText">{user.username}</span></div></li>
             <li><div className="infoRow"><FaEnvelope className="infoIcon" /><span className="truncate">{user.email}</span></div></li>
-            <li><div className="infoRow"><FaMapMarkerAlt className="infoIcon" /><span className="truncate">{user.location}</span></div></li>
+            <li><div className="infoRow"><FaMapMarkerAlt className="infoIcon" /><span className="truncate">{user.location??'N/A'}</span></div></li>
             <li><div className="infoRow"><FaStar className="infoIcon" /><span className="truncate">{user.ratings}</span></div></li>
           </ul>
         </div>

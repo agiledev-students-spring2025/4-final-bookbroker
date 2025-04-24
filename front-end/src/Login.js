@@ -25,6 +25,11 @@ export default function Login() {
                 throw new Error(data.message || 'Login failed');
             }
 
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('userId', data.user.id);
+            localStorage.setItem('username', data.user.username);
+
+            window.location.href = "/home";
         }
         catch (err){
             console.log(err)
@@ -40,11 +45,6 @@ export default function Login() {
             <div className="form-email">
                 <label htmlFor="email">Email:</label>
                 <input type="text" id="email" name="email" required />
-            </div>
-
-            <div className="form-user">
-                <label htmlFor="username">Username:</label>
-                <input type="text" id="username" name="username" required />
             </div>
 
             <div className="form-pass">

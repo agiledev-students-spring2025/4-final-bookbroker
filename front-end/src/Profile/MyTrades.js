@@ -9,7 +9,12 @@ const MyBooks = () => {
   const [offeringsBooks, setOfferingsBooks] = useState([]);
 
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/user/offered`)
+    const token = localStorage.getItem('token')
+    fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/user/offered`, {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    })
     .then(res => res.json())
     .then(data => {
         setOfferingsBooks(data);
