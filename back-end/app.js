@@ -326,7 +326,15 @@ app.get("/user/get-recommended-books", authMiddleware, async (req, res) => {
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ error: "User not found" });
     try {
-        const books = await OfferedBook.aggregate([
+        const userLocation = user.location; // Save user's location
+
+        // Get the genres of the books the user has offfered
+        // const userOfferedBooks = await OfferedBook.find({ owner: userId });
+        // const userGenres = userOfferedBooks.map(book => book.genre);
+        
+        // aggregate call joins OfferedBook and User collection
+        // Matches books by the owner field in OfferedBook the the _id field in User
+        const books = await OfferedBook.aggregate([  
             {
               $lookup: {
                 from: "users", // Lookup from the User collection
@@ -336,12 +344,13 @@ app.get("/user/get-recommended-books", authMiddleware, async (req, res) => {
               }
             },
             {
-              $unwind: "$ownerDetails" 
+              $unwind: "$ownerDetails" // unwind ownerDetails so we can access the fields
             },
             {
               $match: {
                 "ownerDetails.location": userLocation, // find books by user's location
-                "owner": { $ne: mongoose.Types.ObjectId(userId) } // exclude books offered by the current user
+                // "genre": { $in: userGenres }, // match books that share genres with the user's offered books
+                "owner": { $ne: new mongoose.Types.ObjectId(userId) } // exclude books offered by the current user
               }
             },
             {

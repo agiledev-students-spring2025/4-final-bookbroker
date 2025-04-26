@@ -10,19 +10,10 @@ const Home = () => {
     const [showToast, setShowToast] = useState(false);
     const token = localStorage.getItem('token');
 
-
     useEffect(() => {
-        fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/user/get-recommended-books`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}` 
-            }
-        }).then(res => res.json())
-        .then(data => {
-            setBooks(data);
-        })
+        setBooks(generateBooks(5));
     }, []);
+   
 
     useEffect(() => {
         setUser(generateUser());
