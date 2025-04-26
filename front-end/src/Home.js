@@ -8,11 +8,12 @@ const Home = () => {
     const [user, setUser] = useState();
     const screenRefs = useRef([]);
     const [showToast, setShowToast] = useState(false);
-
+    const token = localStorage.getItem('token');
 
     useEffect(() => {
         setBooks(generateBooks(5));
     }, []);
+   
 
     useEffect(() => {
         setUser(generateUser());
