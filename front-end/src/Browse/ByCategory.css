@@ -30,9 +30,12 @@
   .category-list {
     width: 80%;
     max-width: 400px;
+    height: 50vh; 
     display: flex;
-    flex-direction: column;
-    margin-top: 15px;
+    flex-direction: column; 
+    padding: 140px 10px 60px 10px; 
+    overflow-y: auto; 
+    border-radius: 40px;
   }
   
   .category-btn {
