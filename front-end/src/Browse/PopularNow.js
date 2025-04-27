@@ -1,6 +1,5 @@
-import './PopularNow.css'
+import './PopularNow.css';
 import { Link } from 'react-router-dom';
-import { getBookImage } from '../MockData.js';
 import { useEffect, useState } from 'react';
 
 const PopularNow = () => {
@@ -17,15 +16,17 @@ const PopularNow = () => {
     }, []);
 
     return (
-        <main className="Popular">
+        <main className="PopularNow">
             <h1 className="popular-title">Popular Now</h1>
 
             <div className="popular-books">
                 {books.length > 0 ? (
                     books.map((book) => (
-                        <div key={book.id} className="popular-book">
-                            
-                            <img src={getBookImage(book.id)} alt="Book Cover" />
+                        <div key={book._id || book.id} className="popular-book">
+                            <img
+                                src={book.cover || '/default-book.png'}
+                                alt="Book Cover"
+                            />
 
                             <div className="popular-book-text">
                                 <h2>{book.title || "[NO TITLE]"}</h2>
@@ -33,7 +34,7 @@ const PopularNow = () => {
                                 <p>{book.author || "[NO AUTHOR]"}</p>
                             </div>
 
-                            <Link to={`/books/${book.id}`}>
+                            <Link to={`/books/${book._id || book.id}`}>
                                 <button className="interest-btn">Show Interest</button>
                             </Link>
                         </div>
@@ -46,4 +47,4 @@ const PopularNow = () => {
     );
 };
 
-export default PopularNow
+export default PopularNow;
