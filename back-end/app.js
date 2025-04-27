@@ -51,7 +51,7 @@ const conversationSchema = new Schema({
 
 const messageSchema = new Schema({
   user: Schema.ObjectId,
-  conversation: conversationSchema,
+  conversation: Schema.ObjectId,
   createdAt: { type: Date },
   content: String
 })
@@ -356,6 +356,7 @@ app.get("/messages", async (req, res) => {
 app.get("/messages/:user", async (req, res) => {
 
   try {
+
     const conversation = await Conversation.find({
       users: {
         $in: [req.params.user, req.user.userId]
@@ -391,33 +392,41 @@ app.get("/messages/:user", async (req, res) => {
     res.json(formattedMessages)
   }
   catch (err) {
-    console.err("Error fetching messages: " + err)
+    console.error("Error fetching messages: " + err)
     res.status(500).json({ message: "Internal server error while fetching messages" })
   }
 });
 
 app.post("/messages/:user", async (req, res) => {
   const { content } = req.body
+  console.log(req.body)
 
   try {
-    const conversation = await Conversation.find({ 
+    let conversation = await Conversation.findOne({ 
       users: {
         $in: [req.params.user, req.user.userId]
       }, 
     })
     if (!conversation) {
-      const newConversation = new Conversation({
+      newConversation = new Conversation({
         users: [req.params.user, req.user.userId]
       })
       conversation = await newConversation.save()
     }
 
+    const conversationId = conversation["_id"]
+    console.log(conversationId)
+
     const message = new Message({
       timestamp: new Date(),
       content: content,
-      conversation: conversation["_id"],
+      conversation: conversationId,
       user: req.user.userId
     })
+
+    console.log(message)
+    await message.save()
+    res.status(200).json({ messageId: message["_id"] })
   } 
   catch (err) {
     console.error("Error sending message: ", err.message)
