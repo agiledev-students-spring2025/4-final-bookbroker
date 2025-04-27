@@ -3,15 +3,20 @@ import { useState, useEffect } from "react";
 
 const Feed = () => {
   const [booksData, setBooksData] = useState([]);
+  const token = localStorage.getItem('token');
 
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/feed`)
-      .then(res => res.json())
-      .then(data => setBooksData(data))
-      .catch(err => {
-        console.error('Failed to fetch feed books:', err);
-        setBooksData([]);
-      });
+    fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/user/get-recommended-books`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
+        }
+    }).then(res => res.json())
+    .then(data => {
+        setBooksData(data);
+        console.log(data);
+    })
   }, []);
 
   return (

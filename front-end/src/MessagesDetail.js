@@ -1,10 +1,12 @@
 import './Messages.css'
 import { useState, useEffect, } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
+import { FaAngleLeft } from 'react-icons/fa';
 
 const MessagesDetail = () => {
     const { user } = useParams();
     const token = localStorage.getItem('token')
+    const navigate = useNavigate();
 
     const [messages, setMessages] = useState([]);
     useEffect(() => {
@@ -27,12 +29,18 @@ const MessagesDetail = () => {
 
     return (
         <main>
-            <div class='font-bold text-center p-4'>{user}</div>
+            <div className="titlebox mb-4">
+                <button className="iconButton backButton" onClick={() => navigate(-1)}>
+                    <FaAngleLeft />
+                </button>
 
-            <ul class='space-y-4'>
+                <h1 className="title"> {user} </h1>
+            </div>
+
+            <ul class='messages-container space-y-4'>
                 {messages.map((message, index) => (
                     
-                    <li key={index} class='border-solid border-2 border-black p-2 '>
+                    <li key={index} class='infoContainer fade-in'>
                         {/* Div around all content used to allign time stamp to the right */}
                         <div class='flex w-full justify-between'>
 

@@ -1,22 +1,62 @@
 import './BookPage.css';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import { FaAngleLeft } from 'react-icons/fa';
 
 const BookPage = () => {
   const { id } = useParams();
   const [book, setBook] = useState({});
+
+  const [isInWishlist, setIsInWishlist] = useState(false);
   const navigate = useNavigate();
-  const token = localStorage.getItem('token')
-  // const userId = localStorage.getItem("userId")
+  const token = localStorage.getItem('token');
+  const userId = localStorage.getItem("userId");
+
+  const addToWishlist = () => {
+    if (!token) {
+      alert("You must be logged in to add a book to your wishlist.");
+      return;
+    }
+
+    const bookData = {
+      title: book.title,
+      author: book.author,
+      publisher: book.publisher,
+      year: book.year,
+      cover: book.cover,
+      isbn: book.isbn,
+      genre: book.genre,
+      desc: book.desc
+    };
+
+    fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/user/add-wishlist-book`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(bookData)
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.message) {
+          console.log('Book added to wishlist successfully!');
+          setIsInWishlist(true);
+        } else {
+          console.log('Failed to add book to wishlist.');
+        }
+      })
+      .catch(err => {
+        console.error('Error:', err);
+        alert('An error occurred. Please try again.');
+      });
+  };
 
   useEffect(() => {
     fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/books/${id}`)
       .then(res => res.json())
       .then(data => {
         setBook(data);
-        console.log(data)
       })
       .catch(err => {
         console.error('Failed to fetch book:', err);
@@ -36,6 +76,20 @@ const BookPage = () => {
       .then(res => console.log(res))
     
   }
+  useEffect(() => {
+    if (book.isbn && token) {
+      fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/user/wishlist/${book.isbn}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+        .then(res => res.json())
+        .then(data => setIsInWishlist(data.exists))
+        .catch(err => {
+          console.error('Error checking wishlist status:', err);
+        });
+    }
+  }, [book.isbn, token]);
 
   return (
     <main className="BookPage page-slide-in">
@@ -65,8 +119,16 @@ const BookPage = () => {
       </div>
 
       <div className="book-page-actions">
-        <button className="book-action-btn wishlist-btn">Add to Wishlist</button>
-        <button className="book-action-btn contact-btn" onClick={openConversationWithOwner}>Contact Owner</button>
+        {isInWishlist ? (
+          <p>Already in Wishlist</p>
+        ) : (
+          <button className="book-action-btn wishlist-btn" onClick={addToWishlist}>
+            Add to Wishlist
+          </button>
+        )}
+        <button className="book-action-btn contact-btn" onClick={openConversationWithOwner}>
+          Contact Owner
+        </button>
       </div>
 
       <div className="book-description-section">

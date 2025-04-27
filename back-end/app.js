@@ -22,6 +22,7 @@ const { Schema } = mongoosePkg;
 
 // Define schemas
 const wishlistBookSchema = new Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Referense a user
   title: String,
   author: String,
   publisher: String,
@@ -33,7 +34,7 @@ const wishlistBookSchema = new Schema({
 });
 
 const offeredBookSchema = new Schema({
-  owner: Schema.ObjectId,
+  owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   title: String,
   author: String,
   publisher: String,
@@ -129,15 +130,14 @@ app.post("/auth/login", async (req, res) => {
   
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
-  
+      
       const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '2h' });
+      
       res.json({ token, user: { id: user._id, username: user.username } });
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
 });
-
-
 
 app.get("/books", async (req, res) => {
   const query = req.query.query?.toLowerCase() || "";
@@ -219,6 +219,11 @@ app.get("/users/:id", async (req, res) => {
   }
 });
 
+app.get("/foryou", async (req, res) => {
+    const userId = req.query.id;
+
+})
+
 //middleware for authentication, every route after this line will be checked for authentication
 //modify the front end code accordingly (see Login.js for an example)
 app.use(authMiddleware)
@@ -233,21 +238,42 @@ app.get("/user", async (req, res) => {
     }
 });
 
-app.get("/user/wishlist", async (req, res) => {
+app.get("/user/wishlist", authMiddleware, async (req, res) => {
   try {
-    const books = await WishlistBook.find();
+    const books = await WishlistBook.find( { userId: req.user.userId });
     res.json(books);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-app.get("/user/offered", async (req, res) => {
+app.get("/user/offered", authMiddleware, async (req, res) => {
   try {
-    const books = await OfferedBook.find();
+    const books = await OfferedBook.find({ owner: req.user.userId  });
     res.json(books);
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+app.get("/users/:id/wishlist", authMiddleware, async (req, res) => {
+  try {
+    const books = await WishlistBook.find({ userId: req.params.id });
+    res.json(books);
+  } catch (err) {
+    console.error("Error fetching wishlist for user:", err);
+    res.status(500).json({ error: "Failed to fetch wishlist" });
+  }
+});
+
+// Get public offered books for a specific user
+app.get("/users/:id/offered", authMiddleware, async (req, res) => {
+  try {
+    const books = await OfferedBook.find({ owner: req.params.id }); 
+    res.json(books);
+  } catch (err) {
+    console.error("Error fetching offered books for user:", err);
+    res.status(500).json({ error: "Failed to fetch offered books" });
   }
 });
 
@@ -261,7 +287,8 @@ app.post("/user/add-wishlist-book",
 
     const { title, author, publisher, year, cover, isbn, genre, desc } = req.body;
     try {
-      const book = new WishlistBook({ title, author, publisher, year, cover, isbn, genre, desc });
+      // Add book associated with userId   
+      const book = new WishlistBook({ userId: req.user.userId, title, author, publisher, year, cover, isbn, genre, desc });
       await book.save();
       res.status(201).json({ message: "successfully added wishlist book" });
     } catch (err) {
@@ -285,6 +312,66 @@ app.post("/user/add-offered-book",
       res.status(201).json({ message: "successfully added offered book" });
     } catch (err) {
       res.status(500).json({ error: err.message });
+    }
+});
+
+// Check if a certain book is in the user's wishlist by ISBN
+// Use authMiddleware to ensure user exists(?) idk im following the comment on line 233
+app.get("/user/wishlist/:isbn", authMiddleware, async (req, res) => {
+  const { isbn } = req.params;
+  try {
+    // Search for the book in the user's wishlist
+    const book = await WishlistBook.findOne({ userId: req.user.userId, isbn });
+    if (book) {
+      res.json({ exists: true });
+    } else {
+      res.json({ exists: false });
+    }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get("/user/get-recommended-books", authMiddleware, async (req, res) => {
+    const userId = req.user.userId;
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ error: "User not found" });
+    try {
+        const userLocation = user.location; // Save user's location
+
+        // Get the genres of the books the user has offfered
+        // const userOfferedBooks = await OfferedBook.find({ owner: userId });
+        // const userGenres = userOfferedBooks.map(book => book.genre);
+        
+        // aggregate call joins OfferedBook and User collection
+        // Matches books by the owner field in OfferedBook the the _id field in User
+        const books = await OfferedBook.aggregate([  
+            {
+              $lookup: {
+                from: "users", // Lookup from the User collection
+                localField: "owner", // find field of owner
+                foreignField: "_id",
+                as: "ownerDetails" // name the lookup as ownerDetails
+              }
+            },
+            {
+              $unwind: "$ownerDetails" // unwind ownerDetails so we can access the fields
+            },
+            {
+              $match: {
+                "ownerDetails.location": userLocation, // find books by user's location
+                // "genre": { $in: userGenres }, // match books that share genres with the user's offered books
+                "owner": { $ne: new mongoose.Types.ObjectId(userId) } // exclude books offered by the current user
+              }
+            },
+            {
+              $sort: { createdAt: -1 }
+            }
+          ]);
+        console.log(books);
+        res.json(books);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
 });
 
@@ -322,6 +409,43 @@ try {
     res.status(500).json({ message: "Internal server error" });
 }
 });
+
+app.delete("/user/wishlist/:id", authMiddleware, async (req, res) => {
+  try {
+    const book = await WishlistBook.findOneAndDelete({
+      _id: req.params.id,
+      userId: req.user.userId
+    });
+
+    if (!book) {
+      return res.status(404).json({ message: "Book not found or not authorized" });
+    }
+
+    res.json({ message: "Book successfully deleted" });
+  } catch (err) {
+    console.error("Error deleting wishlist book:", err);
+    res.status(500).json({ message: "Internal server error while deleting wishlist book" });
+  }
+});
+
+app.delete("/user/offered/:id", authMiddleware, async (req, res) => {
+  try {
+    const book = await OfferedBook.findOneAndDelete({
+      _id: req.params.id,
+      owner: mongoose.Types.ObjectId.createFromHexString(req.user.userId)
+    });
+
+    if (!book) {
+      return res.status(404).json({ message: "Book not found or not authorized" });
+    }
+
+    res.json({ message: "Book successfully deleted" });
+  } catch (err) {
+    console.error("Error deleting offered book:", err);
+    res.status(500).json({ message: "Internal server error while deleting offered book" });
+  }
+});
+
 
 app.post("/logout", (req, res) => {
   res.status(200).json({ message: "Logout: test msg" });

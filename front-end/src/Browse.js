@@ -1,5 +1,6 @@
 import './Browse.css'
 import { useNavigate } from "react-router-dom";
+import { FaAngleLeft } from 'react-icons/fa';
 
 const Browse = () => {
     const navigate = useNavigate();
@@ -14,6 +15,10 @@ const Browse = () => {
     return (
         <main className="Browse">
             <div className="titlebox">
+                <button className="iconButton backButton" onClick={() => navigate("/home")}>
+                    <FaAngleLeft />
+                </button>
+
                 <h1 className="title">Browse</h1>
             </div>
             

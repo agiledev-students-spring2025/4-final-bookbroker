@@ -1,28 +1,34 @@
-import './Search.css'
-// import axios from "axios"; Commenting until server is ready
-import { useState, useEffect } from "react";
-import { generateBooks, getBookImage } from '../MockData.js'
+import './Search.css';
+import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const Search = () => {
-    const [ booksData, setBooksData ] = useState([]);
-    const [ searchQuery, setSearchQuery ] = useState(null);
+    const [booksData, setBooksData] = useState([]);
+    const [inputValue, setInputValue] = useState('');
+    const [hasSearched, setHasSearched] = useState(false); // New: track if user clicked search
 
-    useEffect(() => {
-    /*
-    Commenting until server is ready
+    const handleSearch = () => {
+        const query = inputValue.trim();
+        if (!query) return;
 
-        if (searchQuery === null) {
-            return;
+        fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/books?query=${encodeURIComponent(query)}`)
+            .then(res => res.json())
+            .then(data => {
+                setBooksData(data);
+                setHasSearched(true); // Mark that user has searched
+            })
+            .catch(err => {
+                console.error("Failed to fetch search results:", err);
+                setBooksData([]);
+                setHasSearched(true); // Still mark searched even if error
+            });
+    };
+
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            handleSearch();
         }
-
-        axios
-            .get(`https://my.api.mockaroo.com/books.json?key=${process.env.REACT_APP_MOCK_BOOK_API_KEY_2}`)
-            .then(response => setBooksData(response.data))
-            .catch(err => console.error(err))
-    */
-
-        setBooksData(generateBooks(25))
-    }, [searchQuery])
+    };
 
     return (
         <main className="Search">
@@ -32,36 +38,46 @@ const Search = () => {
 
             {/* Search Bar */}
             <div className="search-bar">
-                <input type="text" placeholder="Search for books" />
-                <button onClick={() => {
-                    setSearchQuery("");
-                }}>
+                <input 
+                    type="text" 
+                    placeholder="Search by title, author, or ISBN" 
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    onKeyDown={handleKeyPress}
+                />
+                <button onClick={handleSearch}>
                     Search
                 </button>
             </div>
 
             {/* Books */}
-            <div className="search-books">
-                {booksData.map((book, index) => (
-                    <div key={index} className="search-book">
-                        <img src={getBookImage(book.id)} alt="Book Cover" />
-                        
-                        <div className="search-book-text">
-                            <h2>{book.title}</h2>
-                            <p>{book.year}</p>
-                            <p>{book.author}</p>
-                        </div>
+            {hasSearched && (
+                <div className="search-books">
+                    {booksData.length > 0 ? (
+                        booksData.map((book, index) => (
+                            <div key={book._id || index} className="search-book">
+                                <img src={book.cover || '/default-book.png'} alt="Book Cover" />
 
-                        <a href={"/books/" + book.id} className="search-book-button">
-                            <button>
-                                Show Interest
-                            </button>
-                        </a>
-                    </div>
-                ))}
-            </div>
+                                <div className="search-book-text">
+                                    <h2>{book.title || "[NO TITLE]"}</h2>
+                                    <p>{book.year || "[NO DATE]"}</p>
+                                    <p>{book.author || "[NO AUTHOR]"}</p>
+                                </div>
+
+                                <Link to={`/books/${book._id}`} className="search-book-button">
+                                    <button>
+                                        Show Interest
+                                    </button>
+                                </Link>
+                            </div>
+                        ))
+                    ) : (
+                        <p className="no-books">No books found for this search.</p>
+                    )}
+                </div>
+            )}
         </main>
-    )
-}
+    );
+};
 
-export default Search
+export default Search;
