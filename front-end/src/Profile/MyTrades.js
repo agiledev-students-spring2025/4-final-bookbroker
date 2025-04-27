@@ -1,6 +1,6 @@
 import './MyTrades.css'
 import { useEffect, useState } from 'react';
-import { FaBookOpen, FaAngleLeft} from 'react-icons/fa';
+import { FaBookOpen, FaAngleLeft, FaTrash} from 'react-icons/fa';
 import { generateBooks } from '../MockData';
 import { Link } from 'react-router-dom';
 
@@ -25,6 +25,28 @@ const MyBooks = () => {
     })
   }, []);
 
+  const handleDelete = (bookId) => {
+    console.log(bookId)
+    const token = localStorage.getItem("token");
+    fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/user/offered/${bookId}`, {
+        method: "DELETE",
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    })
+    .then(res => {
+        if(res.ok){
+            setOfferingsBooks(prevBooks => prevBooks.filter(book => book._id !== bookId))
+        }
+        else{
+            console.error("Failed to delete book from wishlist");
+        }
+    })
+    .catch(err => {
+        console.error("Error deleting book:", err);
+    });
+  }
+
   return (
     <div>
         <div className="titlebox offeringsHeader">
@@ -41,6 +63,13 @@ const MyBooks = () => {
                 <li key={index} className="offeringItem">
                     <FaBookOpen className="bookIcon" />
                     <strong>{book.title}</strong>
+                    <button 
+                      className="deleteButton"
+                      onClick={() => handleDelete(book._id)} 
+                      style={{ marginLeft: "10px", background: "none", border: "none", cursor: "pointer" }}
+                    >
+                      <FaTrash />
+                    </button>
                 </li>
                 ))
             ) : (

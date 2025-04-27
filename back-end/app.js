@@ -399,6 +399,43 @@ try {
 }
 });
 
+app.delete("/user/wishlist/:id", authMiddleware, async (req, res) => {
+  try {
+    const book = await WishlistBook.findOneAndDelete({
+      _id: req.params.id,
+      userId: req.user.userId
+    });
+
+    if (!book) {
+      return res.status(404).json({ message: "Book not found or not authorized" });
+    }
+
+    res.json({ message: "Book successfully deleted" });
+  } catch (err) {
+    console.error("Error deleting wishlist book:", err);
+    res.status(500).json({ message: "Internal server error while deleting wishlist book" });
+  }
+});
+
+app.delete("/user/offered/:id", authMiddleware, async (req, res) => {
+  try {
+    const book = await OfferedBook.findOneAndDelete({
+      _id: req.params.id,
+      owner: mongoose.Types.ObjectId.createFromHexString(req.user.userId)
+    });
+
+    if (!book) {
+      return res.status(404).json({ message: "Book not found or not authorized" });
+    }
+
+    res.json({ message: "Book successfully deleted" });
+  } catch (err) {
+    console.error("Error deleting offered book:", err);
+    res.status(500).json({ message: "Internal server error while deleting offered book" });
+  }
+});
+
+
 app.post("/logout", (req, res) => {
   res.status(200).json({ message: "Logout: test msg" });
 });
