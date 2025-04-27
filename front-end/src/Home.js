@@ -8,8 +8,10 @@ const Home = () => {
     const screenRefs = useRef([]);
     const [showToast, setShowToast] = useState(false);
 
+
     const token = localStorage.getItem('token');
     const userId = localStorage.getItem('userId');
+
 
     useEffect(() => {
         // Fetch real offered books from backend
@@ -23,6 +25,7 @@ const Home = () => {
                 setBooks([]);
             });
     }, []);
+   
 
     useEffect(() => {
         // Fetch real user data
