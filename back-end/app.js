@@ -53,7 +53,7 @@ const conversationSchema = new Schema({
 const messageSchema = new Schema({
   user: Schema.ObjectId,
   conversation: Schema.ObjectId,
-  createdAt: { type: Date },
+  createdAt: { type: Date},
   content: String
 })
 
@@ -212,7 +212,7 @@ app.get("/popular", async (req, res) => {
 
 app.get("/users/:id", async (req, res) => {
   try {
-    const user = await User.find({ "_id": req.params.id });
+    const user = await User.findById( req.params.id );
     res.json(user);
   } catch (err) {
     res.status(500).json({ error: "Error fetching user" })
@@ -488,7 +488,6 @@ app.get("/messages", async (req, res) => {
 
 app.get("/messages/:user", async (req, res) => {
 
-  console.log(req.user)
   try {
 
     const conversation = await Conversation.findOne({
@@ -497,13 +496,14 @@ app.get("/messages/:user", async (req, res) => {
       }
     })
 
+    const requester = await User.findById(req.user.userId, {"_id": 1, "username": 1, "location": 1, "rating": 1})
+    const nonRequester = await User.findById(req.params.user, {"_id": 1, "username": 1, "location": 1, "rating": 1})
+
     if (!conversation) {
       res.status(404).json({ message: "Conversation not found" })
     }
 
     const messages = await Message.find({ conversation: conversation["_id"] })
-    console.log(messages)
-    console.log(conversation)
 
     const formattedMessages = messages.map(msg => {
       // Just gets the user that isn't the current user in the conversation
@@ -511,11 +511,11 @@ app.get("/messages/:user", async (req, res) => {
       let sender
       let receiver
       if (msg.user == req.user.userId) {
-        sender = req.user.userId
-        receiver = otherUser
+        sender = requester
+        receiver = nonRequester
       } else {
-        sender = otherUser
-        receiver = req.user.userId
+        sender = nonRequester
+        receiver = requester
       }
 
       return { 
@@ -523,7 +523,7 @@ app.get("/messages/:user", async (req, res) => {
         sender: sender,
         receiver: receiver,
         content: msg.content,
-        timestamp: msg.timestamp
+        timestamp: msg.createdAt
       }
     }) 
 
@@ -555,10 +555,10 @@ app.post("/messages/:user", async (req, res) => {
     const conversationId = conversation["_id"]
 
     const message = new Message({
-      timestamp: new Date(),
       content: content,
       conversation: conversationId,
-      user: req.user.userId
+      user: req.user.userId,
+      createdAt: new Date()
     })
 
     await message.save()

@@ -4,12 +4,28 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import { FaAngleLeft } from 'react-icons/fa';
 
 const MessagesDetail = () => {
+    const [otherUser, setOtherUser] = useState("Loading...")
     const { user } = useParams();
     const token = localStorage.getItem('token')
     const navigate = useNavigate();
 
     const [messages, setMessages] = useState([]);
     useEffect(() => {
+        fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/users/${user}`,{
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        })
+            .then(res => res.json())
+            .then(data => {
+                console.log(data)
+                setOtherUser(data)
+            })
+            .catch(err => {
+                console.log("Failed to fetch user", err)
+            })
+
+
         fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/messages/${user}`,{
             headers: {
                 "Authorization": `Bearer ${token}`
@@ -34,7 +50,7 @@ const MessagesDetail = () => {
                     <FaAngleLeft />
                 </button>
 
-                <h1 className="title"> {user} </h1>
+                <h1 className="title"> {otherUser.username} </h1>
             </div>
 
             <ul class='messages-container space-y-4'>
@@ -46,18 +62,17 @@ const MessagesDetail = () => {
 
                             {/* Div box for pfp, username, and text*/}
                             <div className="flex items-center space-x-3">
-                                <img className="w-10 h-10 bg-gray-300" alt="Profile" />
-                                <p className="font-bold text-brown">{message.sender}</p>
+                                <p className="font-bold text-brown">{message.sender.username}</p>
 
 
                                 {/* Trunkate text to ensure the box doesn't break */}
-                                <div className="w-[140px] overflow-hidden text-center">
-                                    <p className="truncate max-w-[140px] text-brown">{message.content}</p>
+                                <div className="text-right">
+                                    <p className="text-brown">{message.content}</p>
                                 </div>
                             </div>
 
                             {/* Include timestamp of message*/}
-                            <p class='text-sm text-orange absolute right-2'> | {new Date(message.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+                            <p class='text-sm text-orange absolute right-2'> | {new Date(message.timestamp).toLocaleString()}</p>
                         </div>
 
                     </li>
