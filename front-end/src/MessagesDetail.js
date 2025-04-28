@@ -8,6 +8,7 @@ const MessagesDetail = () => {
     const { user } = useParams();
     const token = localStorage.getItem('token')
     const navigate = useNavigate();
+    const [message, setMessage] = useState("")
 
     const [messages, setMessages] = useState([]);
     useEffect(() => {
@@ -33,7 +34,7 @@ const MessagesDetail = () => {
         })
         .then(res => res.json())
         .then(data => {
-            console.log(data)
+            data = data.sort((a, b) => b.timestamp - a.timestamp)
             setMessages(data)
         })
         .catch(err => {
@@ -42,6 +43,17 @@ const MessagesDetail = () => {
         })
     }, [])
 
+    function handleMessageSend(e) {
+        e.preventDefault()
+        fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/messages/${user}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({ content: message })
+        })    
+    }
 
     return (
         <main>
@@ -78,6 +90,10 @@ const MessagesDetail = () => {
                     </li>
                 ))}
             </ul>
+            <form onSubmit={handleMessageSend}>
+                <input type="text" value={message} placeholder="Send message..." onChange={e => setMessage(e.target.value)} />
+                <input type="submit" />
+            </form>
 
         </main>
     );
