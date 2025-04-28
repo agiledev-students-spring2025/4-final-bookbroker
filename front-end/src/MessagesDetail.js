@@ -26,21 +26,26 @@ const MessagesDetail = () => {
                 console.log("Failed to fetch user", err)
             })
 
+        }, [])
 
-        fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/messages/${user}`,{
-            headers: {
-                "Authorization": `Bearer ${token}`
-            }
-        })
-        .then(res => res.json())
-        .then(data => {
-            data = data.sort((a, b) => b.timestamp - a.timestamp)
-            setMessages(data)
-        })
-        .catch(err => {
-            console.log("Failed to fetch messages:", err)
-            setMessages([])
-        })
+    useEffect(() => {
+        const interval = setInterval(() => {
+            fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/messages/${user}`,{
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                data = data.sort((a, b) => b.timestamp - a.timestamp)
+                setMessages(data)
+            })
+            .catch(err => {
+                console.log("Failed to fetch messages:", err)
+                setMessages([])
+            })
+        }, 1000)
+        return () => clearInterval(interval)
     }, [])
 
     function handleMessageSend(e) {
