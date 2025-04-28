@@ -73,7 +73,8 @@ const BookPage = () => {
       },
       body: JSON.stringify({ content: `Hey, I'm interested in your listing for ${book.title}` })
     })
-      .then(res => console.log(res))
+      .then(res => navigate(`/messages/${book.owner?.id}`))
+      .catch(err => console.error(err))
     
   }
   useEffect(() => {
