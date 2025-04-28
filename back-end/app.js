@@ -368,7 +368,6 @@ app.get("/user/get-recommended-books", authMiddleware, async (req, res) => {
               $sort: { createdAt: -1 }
             }
           ]);
-        console.log(books);
         res.json(books);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -457,17 +456,27 @@ app.get("/messages", async (req, res) => {
     
     const conversations = await Conversation.find({
       users: {
-        $in: userId
+        $in: [userId]
       }
     })
 
-    const formattedConversations = conversations.map(convo => {
-      const otherUser = req.user.userId == convo[0] ? convo[1] : convo[0]
+    const formattedConversations = await Promise.all(conversations.map(async convo => {
+      const otherUser = userId == convo.users[0] ? convo.users[1] : convo.users[0]
+      
+      const otherUserResult = await User.findOne({"_id": otherUser})
+
+      const otherUserInfo = {
+        id: otherUserResult.id,
+        location: otherUserResult.location,
+        ratings: otherUserResult.ratings,
+        username: otherUserResult.username
+      }
+
       return {
         id: convo["_id"],
-        otherUser: otherUser,
+        otherUser: otherUserInfo,
       }
-    })
+    }))
 
     res.json(formattedConversations)
 
@@ -479,11 +488,12 @@ app.get("/messages", async (req, res) => {
 
 app.get("/messages/:user", async (req, res) => {
 
+  console.log(req.user)
   try {
 
-    const conversation = await Conversation.find({
+    const conversation = await Conversation.findOne({
       users: {
-        $in: [req.params.user, req.user.userId]
+        $in: [[req.params.user, req.user.userId], [req.user.userId, req.params.user]]
       }
     })
 
@@ -492,16 +502,20 @@ app.get("/messages/:user", async (req, res) => {
     }
 
     const messages = await Message.find({ conversation: conversation["_id"] })
+    console.log(messages)
+    console.log(conversation)
 
     const formattedMessages = messages.map(msg => {
       // Just gets the user that isn't the current user in the conversation
       const otherUser = conversation.users[conversation.users.indexOf(msg.user) ^ 1]
+      let sender
+      let receiver
       if (msg.user == req.user.userId) {
-        const sender = req.user.userId
-        const receiver = otherUser
+        sender = req.user.userId
+        receiver = otherUser
       } else {
-        const sender = otherUser
-        const receiver = req.user.userId
+        sender = otherUser
+        receiver = req.user.userId
       }
 
       return { 
@@ -523,23 +537,22 @@ app.get("/messages/:user", async (req, res) => {
 
 app.post("/messages/:user", async (req, res) => {
   const { content } = req.body
-  console.log(req.body)
 
   try {
     let conversation = await Conversation.findOne({ 
       users: {
-        $in: [req.params.user, req.user.userId]
+        $in: [[req.params.user, req.user.userId], [req.user.userId, req.params.user]]
       }, 
     })
     if (!conversation) {
-      newConversation = new Conversation({
+      const newConversation = new Conversation({
         users: [req.params.user, req.user.userId]
       })
+
       conversation = await newConversation.save()
     }
 
     const conversationId = conversation["_id"]
-    console.log(conversationId)
 
     const message = new Message({
       timestamp: new Date(),
@@ -548,7 +561,6 @@ app.post("/messages/:user", async (req, res) => {
       user: req.user.userId
     })
 
-    console.log(message)
     await message.save()
     res.status(200).json({ messageId: message["_id"] })
   } 

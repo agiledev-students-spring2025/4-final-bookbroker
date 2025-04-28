@@ -34,14 +34,13 @@ const Messages = () => {
         {messages.map((message, index) => (
             <li key={index} className='infoContainer fade-in'>
                 {/* Clickable dynamic link to new page */}
-                <Link to={`/messages/${message.otherUser}`}>
+                <Link to={`/messages/${message.otherUser.id}`}>
                     {/* Div around all content used to allign time stamp to the right */}
                     <div className='flex w-full justify-between'>
 
                         {/* Div box for pfp, username, and text*/}
                         <div className="flex items-center space-x-3">
-                            <img className="w-10 h-10 bg-gray-300" alt="Profile" />
-                            <p className="font-bold text-brown">{message.otherUser}</p>
+                            <p className="font-bold text-brown">{message.otherUser.username}</p>
 
 
                             {/* Trunkate text to ensure the box doesn't break */}
