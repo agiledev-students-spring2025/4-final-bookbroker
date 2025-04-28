@@ -72,8 +72,8 @@ const UserPage = () => {
 
                 <div className={`infoContainer ${fadeInClass.profile}`}>
                     <div className="photoAndButton">
-                    <div className="profilePhoto" alt="Profile">{user.username ? user.username.charAt(0).toUpperCase() : ''}</div>
-                        <button className="messageUserBtn">Message</button>
+                      <div className="profilePhoto" alt="Profile">{user.username ? user.username.charAt(0).toUpperCase() : ''}</div>
+                      <button className="messageUserBtn" onClick={() => navigate(`/messages/${id}`)}>Message</button>
                     </div>
                     <ul className="infoList">
                         <li><div className="infoRow"><span className="truncate usernameText">{user.username}</span></div></li>

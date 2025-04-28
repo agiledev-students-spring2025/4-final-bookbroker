@@ -489,7 +489,6 @@ app.get("/messages", async (req, res) => {
 app.get("/messages/:user", async (req, res) => {
 
   try {
-
     const conversation = await Conversation.findOne({
       users: {
         $in: [[req.params.user, req.user.userId], [req.user.userId, req.params.user]]
@@ -500,7 +499,8 @@ app.get("/messages/:user", async (req, res) => {
     const nonRequester = await User.findById(req.params.user, {"_id": 1, "username": 1, "location": 1, "rating": 1})
 
     if (!conversation) {
-      res.status(404).json({ message: "Conversation not found" })
+      res.status(200).json([])
+      return
     }
 
     const messages = await Message.find({ conversation: conversation["_id"] })
