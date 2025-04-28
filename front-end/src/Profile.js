@@ -181,8 +181,7 @@ const fetchUserData = () => {
       <main className="profile">
         <div className={`infoContainer ${fadeInClass.profile}`}>
           <div className="photoAndButton">
-            <img className="profilePhoto" src="https://www.gravatar.com/avatar/2c7d99fe281ecd3bcd65ab915bac6dd5?s=250" alt="Profile" />
-
+            <div className="profilePhoto" alt="Profile">{user.username ? user.username.charAt(0).toUpperCase() : ''}</div>
             <div className="profile-buttons">
             <Popup
               trigger={<button className="editProfileBtn">Edit Profile</button>}
