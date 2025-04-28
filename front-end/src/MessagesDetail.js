@@ -37,8 +37,10 @@ const MessagesDetail = () => {
             })
             .then(res => res.json())
             .then(data => {
-                data = data.sort((a, b) => b.timestamp - a.timestamp)
-                setMessages(data)
+                const sortedData = data.toSorted((a, b) => {
+                    return new Date(b.timestamp) - new Date(a.timestamp)
+                })
+                setMessages(sortedData)
             })
             .catch(err => {
                 console.log("Failed to fetch messages:", err)
@@ -61,43 +63,42 @@ const MessagesDetail = () => {
     }
 
     return (
-        <main>
+        <main className="h-screen overflow-hidden">
             <div className="titlebox mb-4">
                 <button className="iconButton backButton" onClick={() => navigate(-1)}>
                     <FaAngleLeft />
                 </button>
 
-                <h1 className="title"> {otherUser.username} </h1>
+                <h1 className="truncate title pl-4"> {otherUser.username} </h1>
             </div>
 
-            <ul class='messages-container space-y-4'>
+            <ul class='messages-container h-2/3 border-2 border-black border-solid rounded-lg p-4 overflow-y-scroll space-y-4'>
                 {messages.map((message, index) => (
                     
-                    <li key={index} class='infoContainer fade-in'>
+                    <li key={index} class='bg-white rounded-lg p-2 fade-in'>
                         {/* Div around all content used to allign time stamp to the right */}
                         <div class='flex w-full justify-between'>
 
                             {/* Div box for pfp, username, and text*/}
-                            <div className="flex items-center space-x-3">
-                                <p className="font-bold text-brown">{message.sender.username}</p>
+                            <div className="flex mt-6 items-center space-x-3">
 
-
-                                {/* Trunkate text to ensure the box doesn't break */}
-                                <div className="text-right">
+                                <div className="">
                                     <p className="text-brown">{message.content}</p>
                                 </div>
                             </div>
 
+                            <p className="font-bold truncate absolute left-2 text-brown">{message.sender.username}</p>
+                            
                             {/* Include timestamp of message*/}
-                            <p class='text-sm text-orange absolute right-2'> | {new Date(message.timestamp).toLocaleString()}</p>
+                            <p class='text-sm text-orange absolute right-2'> {new Date(message.timestamp).toLocaleString([], {month:'short', year:'numeric', day:'2-digit',  hour: '2-digit', minute:'2-digit'})}</p>
                         </div>
 
                     </li>
                 ))}
             </ul>
-            <form onSubmit={handleMessageSend}>
-                <input type="text" value={message} placeholder="Send message..." onChange={e => setMessage(e.target.value)} />
-                <input type="submit" />
+            <form className="absolute bottom-16 w-full text-center" onSubmit={handleMessageSend}>
+                <input className="p-2" type="text" value={message} placeholder="Send message..." onChange={e => setMessage(e.target.value)} />
+                <input className="bg-white rounded-lg p-2 ml-4 hover:bg-grey cursor-pointer" type="submit" value="Send" />
             </form>
 
         </main>

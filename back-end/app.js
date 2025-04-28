@@ -538,6 +538,11 @@ app.get("/messages/:user", async (req, res) => {
 app.post("/messages/:user", async (req, res) => {
   const { content } = req.body
 
+  if (content === "") {
+    res.status(200).json({message: "Empty message ignored"})
+    return
+  }
+
   try {
     let conversation = await Conversation.findOne({ 
       users: {
