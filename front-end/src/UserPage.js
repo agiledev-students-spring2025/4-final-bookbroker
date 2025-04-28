@@ -73,7 +73,7 @@ const UserPage = () => {
                 <div className={`infoContainer ${fadeInClass.profile}`}>
                     <div className="photoAndButton">
                         <img className="profilePhoto" src="https://www.gravatar.com/avatar/2c7d99fe281ecd3bcd65ab915bac6dd5?s=250" alt="Profile" />
-                        <button className="messageUserBtn">Message</button>
+                        <button className="messageUserBtn" onClick={() => navigate(`/messages/${id}`)}>Message</button>
                     </div>
                     <ul className="infoList">
                         <li><div className="infoRow"><span className="truncate usernameText">{user.username}</span></div></li>
