@@ -69,7 +69,7 @@ const MessagesDetail = () => {
                     <FaAngleLeft />
                 </button>
 
-                <h1 className="truncate title pl-4"> {otherUser.username} </h1>
+                <a href={`/users/${user}`}><h1 className="truncate title pl-4"> {otherUser.username} </h1></a>
             </div>
 
             <ul class='messages-container h-2/3 border-2 border-black border-solid rounded-lg p-4 overflow-y-scroll space-y-4'>
