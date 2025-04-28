@@ -6,7 +6,7 @@ import { FaAngleLeft } from 'react-icons/fa';
 const BookPage = () => {
   const { id } = useParams();
   const [book, setBook] = useState({});
-  const [user, setUser] = useState({});
+
   const [isInWishlist, setIsInWishlist] = useState(false);
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
@@ -52,45 +52,11 @@ const BookPage = () => {
       });
   };
 
-  const openConversationWithOwner = () => {
-    if (!token) {
-      alert("You must be logged in to contact the owner.");
-      return;
-    }
-
-    fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/messages/${user["_id"]}`, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${token}`
-      }
-    })
-      .then(res => {
-        if (res.ok) {
-          console.log("Conversation opened or exists");
-          navigate("/messages"); // optionally redirect
-        } else {
-          console.error("Failed to open conversation");
-        }
-      })
-      .catch(err => {
-        console.error("Error opening conversation:", err);
-      });
-  };
-
   useEffect(() => {
     fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/books/${id}`)
       .then(res => res.json())
       .then(data => {
         setBook(data);
-        if (data.userid) {
-          fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/users/${data.userid}`)
-            .then(res => res.json())
-            .then(data => setUser(data))
-            .catch(err => {
-              console.log('Failed to fetch user', err);
-              setUser({});
-            });
-        }
       })
       .catch(err => {
         console.error('Failed to fetch book:', err);
@@ -98,6 +64,18 @@ const BookPage = () => {
       });
   }, [id]);
 
+  async function openConversationWithOwner() {
+    fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/messages/${book.owner?.id}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({ content: `Hey, I'm interesting in your listing for ${book.title}` })
+    })
+      .then(res => console.log(res))
+    
+  }
   useEffect(() => {
     if (book.isbn && token) {
       fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/user/wishlist/${book.isbn}`, {
@@ -133,8 +111,8 @@ const BookPage = () => {
           </h3>
           <h2 className="book-owner">
             Offered by:
-            <Link to={`/users/${book.userid}`}>
-              {user.username || "[NO USER]"}
+            <Link to={`/users/${book.owner?.id}`}>
+              {book.owner?.username || "[NO USER]"}
             </Link>
           </h2>
         </div>

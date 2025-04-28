@@ -5,11 +5,16 @@ import { FaAngleLeft } from 'react-icons/fa';
 
 const MessagesDetail = () => {
     const { user } = useParams();
+    const token = localStorage.getItem('token')
     const navigate = useNavigate();
 
     const [messages, setMessages] = useState([]);
     useEffect(() => {
-        fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/messages/${user}`)
+        fetch(`${process.env.REACT_APP_SERVER_ADDRESS}/messages/${user}`,{
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        })
         .then(res => res.json())
         .then(data => {
             console.log(data)
