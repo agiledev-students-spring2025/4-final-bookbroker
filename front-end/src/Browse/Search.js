@@ -1,8 +1,11 @@
 import './Search.css';
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { FaAngleLeft } from 'react-icons/fa';
 
 const Search = () => {
+    const navigate = useNavigate();
     const [booksData, setBooksData] = useState([]);
     const [inputValue, setInputValue] = useState('');
     const [hasSearched, setHasSearched] = useState(false); // New: track if user clicked search
@@ -33,6 +36,9 @@ const Search = () => {
     return (
         <main className="Search">
             <h1 className="search-title">
+            <button className="back-btn" onClick={() => navigate(-1)}>
+                    <FaAngleLeft />
+                </button>
                 Search
             </h1>
 

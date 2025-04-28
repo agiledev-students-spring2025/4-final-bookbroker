@@ -1,8 +1,11 @@
 import './NewlyAdded.css';
 import { Link } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from 'react';
+import { FaAngleLeft } from 'react-icons/fa';
 
 const NewlyAdded = () => {
+    const navigate = useNavigate();
     const [books, setBooks] = useState([]);
 
     useEffect(() => {
@@ -17,7 +20,11 @@ const NewlyAdded = () => {
 
     return (
         <main className="NewlyAdded">
-            <h1 className="new-title">Newly Added</h1>
+            <h1 className="new-title">
+                <button className="back-btn" onClick={() => navigate(-1)}>
+                    <FaAngleLeft />
+                </button>
+                Newly Added</h1>
 
             <div className="new-books">
                 {books.length > 0 ? (

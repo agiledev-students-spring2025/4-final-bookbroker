@@ -15,9 +15,6 @@ const Browse = () => {
     return (
         <main className="Browse">
             <div className="titlebox">
-                <button className="iconButton backButton" onClick={() => navigate("/home")}>
-                    <FaAngleLeft />
-                </button>
 
                 <h1 className="title">Browse</h1>
             </div>
