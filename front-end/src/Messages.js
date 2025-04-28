@@ -43,14 +43,12 @@ const Messages = () => {
                             <p className="font-bold text-brown">{message.otherUser.username}</p>
 
 
-                            {/* Trunkate text to ensure the box doesn't break */}
+                            {/* Truncate text to ensure the box doesn't break */}
                             <div className="w-[140px] overflow-hidden text-center">
                                 <p className="truncate max-w-[140px] text-brown">{message.content}</p>
                             </div>
                         </div>
 
-                        {/* Include timestamp of message*/}
-                        <p className='text-sm text-orange absolute right-2'> | {new Date(message.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
                     </div>
                 </Link>
             </li>
