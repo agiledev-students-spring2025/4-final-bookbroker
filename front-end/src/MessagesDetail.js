@@ -72,7 +72,7 @@ const MessagesDetail = () => {
                 <a href={`/users/${user}`}><h1 className="truncate title pl-4"> {otherUser.username} </h1></a>
             </div>
 
-            <ul class='messages-container h-2/3 border-2 border-black border-solid rounded-lg p-4 overflow-y-scroll space-y-4'>
+            <ul class='messages-container h-2/3 border-2 border-black gap-y-4 leading-none flex flex-col-reverse border-solid rounded-lg p-4 overflow-y-scroll'>
                 {messages.map((message, index) => (
                     
                     <li key={index} class='bg-white rounded-lg p-2 fade-in'>
