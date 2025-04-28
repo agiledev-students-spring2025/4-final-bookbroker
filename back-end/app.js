@@ -53,7 +53,7 @@ const conversationSchema = new Schema({
 const messageSchema = new Schema({
   user: Schema.ObjectId,
   conversation: Schema.ObjectId,
-  createdAt: { type: Date },
+  createdAt: { type: Date},
   content: String
 })
 
@@ -212,7 +212,7 @@ app.get("/popular", async (req, res) => {
 
 app.get("/users/:id", async (req, res) => {
   try {
-    const user = await User.find({ "_id": req.params.id });
+    const user = await User.findById( req.params.id );
     res.json(user);
   } catch (err) {
     res.status(500).json({ error: "Error fetching user" })
@@ -368,7 +368,6 @@ app.get("/user/get-recommended-books", authMiddleware, async (req, res) => {
               $sort: { createdAt: -1 }
             }
           ]);
-        console.log(books);
         res.json(books);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -457,17 +456,27 @@ app.get("/messages", async (req, res) => {
     
     const conversations = await Conversation.find({
       users: {
-        $in: userId
+        $in: [userId]
       }
     })
 
-    const formattedConversations = conversations.map(convo => {
-      const otherUser = req.user.userId == convo[0] ? convo[1] : convo[0]
+    const formattedConversations = await Promise.all(conversations.map(async convo => {
+      const otherUser = userId == convo.users[0] ? convo.users[1] : convo.users[0]
+      
+      const otherUserResult = await User.findOne({"_id": otherUser})
+
+      const otherUserInfo = {
+        id: otherUserResult.id,
+        location: otherUserResult.location,
+        ratings: otherUserResult.ratings,
+        username: otherUserResult.username
+      }
+
       return {
         id: convo["_id"],
-        otherUser: otherUser,
+        otherUser: otherUserInfo,
       }
-    })
+    }))
 
     res.json(formattedConversations)
 
@@ -481,11 +490,14 @@ app.get("/messages/:user", async (req, res) => {
 
   try {
 
-    const conversation = await Conversation.find({
+    const conversation = await Conversation.findOne({
       users: {
-        $in: [req.params.user, req.user.userId]
+        $in: [[req.params.user, req.user.userId], [req.user.userId, req.params.user]]
       }
     })
+
+    const requester = await User.findById(req.user.userId, {"_id": 1, "username": 1, "location": 1, "rating": 1})
+    const nonRequester = await User.findById(req.params.user, {"_id": 1, "username": 1, "location": 1, "rating": 1})
 
     if (!conversation) {
       res.status(404).json({ message: "Conversation not found" })
@@ -496,12 +508,14 @@ app.get("/messages/:user", async (req, res) => {
     const formattedMessages = messages.map(msg => {
       // Just gets the user that isn't the current user in the conversation
       const otherUser = conversation.users[conversation.users.indexOf(msg.user) ^ 1]
+      let sender
+      let receiver
       if (msg.user == req.user.userId) {
-        const sender = req.user.userId
-        const receiver = otherUser
+        sender = requester
+        receiver = nonRequester
       } else {
-        const sender = otherUser
-        const receiver = req.user.userId
+        sender = nonRequester
+        receiver = requester
       }
 
       return { 
@@ -509,7 +523,7 @@ app.get("/messages/:user", async (req, res) => {
         sender: sender,
         receiver: receiver,
         content: msg.content,
-        timestamp: msg.timestamp
+        timestamp: msg.createdAt
       }
     }) 
 
@@ -523,32 +537,35 @@ app.get("/messages/:user", async (req, res) => {
 
 app.post("/messages/:user", async (req, res) => {
   const { content } = req.body
-  console.log(req.body)
+
+  if (content === "") {
+    res.status(200).json({message: "Empty message ignored"})
+    return
+  }
 
   try {
     let conversation = await Conversation.findOne({ 
       users: {
-        $in: [req.params.user, req.user.userId]
+        $in: [[req.params.user, req.user.userId], [req.user.userId, req.params.user]]
       }, 
     })
     if (!conversation) {
-      newConversation = new Conversation({
+      const newConversation = new Conversation({
         users: [req.params.user, req.user.userId]
       })
+
       conversation = await newConversation.save()
     }
 
     const conversationId = conversation["_id"]
-    console.log(conversationId)
 
     const message = new Message({
-      timestamp: new Date(),
       content: content,
       conversation: conversationId,
-      user: req.user.userId
+      user: req.user.userId,
+      createdAt: new Date()
     })
 
-    console.log(message)
     await message.save()
     res.status(200).json({ messageId: message["_id"] })
   } 

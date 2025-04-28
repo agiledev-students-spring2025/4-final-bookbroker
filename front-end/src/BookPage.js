@@ -71,7 +71,7 @@ const BookPage = () => {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
       },
-      body: JSON.stringify({ content: `Hey, I'm interesting in your listing for ${book.title}` })
+      body: JSON.stringify({ content: `Hey, I'm interested in your listing for ${book.title}` })
     })
       .then(res => console.log(res))
     
