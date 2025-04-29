@@ -102,12 +102,7 @@ const Home = () => {
                     <h1 className="title">Home</h1>
                 </div>
                 <div className="home-header-message"> 
-                    <h3>
-                        You've traded {user ? user.ratings || 0 : 0} books.<br/> 
-                        <a href="/feed" className="underline">
-                            Make it {user ? (user.ratings || 0) + 1 : 1}!
-                        </a>
-                    </h3>
+                    <p>Welcome to BookBroker!</p>
                     <h3>Today's picks:</h3>
                 </div>
             </div>

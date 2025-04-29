@@ -1,6 +1,7 @@
 import './ByCategory.css';
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from 'react';
+import { FaAngleLeft } from 'react-icons/fa';
 
 const ByCategory = () => {
   const navigate = useNavigate();
@@ -21,9 +22,12 @@ const ByCategory = () => {
   return (
     <main className="ByCategory">
       <div className="titlebox">
+      <button className="back-btn" onClick={() => navigate(-1)}>
+                    <FaAngleLeft />
+                </button>
         <h1 className='title'>Choose a Genre</h1>
       </div>
-      <ul className="category-list">
+      <ul className="list">
         {genres.map((genre, index) => (
           <li key={index}>
             <button

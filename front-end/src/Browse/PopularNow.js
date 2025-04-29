@@ -1,8 +1,11 @@
 import './PopularNow.css';
 import { Link } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from 'react';
+import { FaAngleLeft } from 'react-icons/fa';
 
 const PopularNow = () => {
+    const navigate = useNavigate();
     const [books, setBooks] = useState([]);
 
     useEffect(() => {
@@ -17,7 +20,11 @@ const PopularNow = () => {
 
     return (
         <main className="PopularNow">
-            <h1 className="popular-title">Popular Now</h1>
+            <h1 className="popular-title">
+                <button className="back-btn" onClick={() => navigate(-1)}>
+                    <FaAngleLeft />
+                </button>
+                Popular Now</h1>
 
             <div className="popular-books">
                 {books.length > 0 ? (

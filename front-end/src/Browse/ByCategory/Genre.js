@@ -1,6 +1,7 @@
 import './Genre.css';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { FaAngleLeft } from 'react-icons/fa';
 
 const fallbackCover = 'https://via.placeholder.com/128x192?text=No+Cover';
 
@@ -21,7 +22,11 @@ const Genre = () => {
 
   return (
     <main className="Genre">
-      <h1 className="genre-title">{genre.charAt(0).toUpperCase() + genre.slice(1)}</h1>
+      <h1 className="genre-title">
+        <button className="back-btn" onClick={() => navigate(-1)}>
+                    <FaAngleLeft />
+                </button>
+                {genre.charAt(0).toUpperCase() + genre.slice(1)}</h1>
 
       <div className="genre-books">
         {books.length > 0 ? (
