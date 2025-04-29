@@ -26,8 +26,16 @@
 - If approved, it will be merged into main. If denied, retry
 
 ## Local Development Setup
-- npm install in the main directory
-(Will be added as needed)
+To start the frontend:
+```
+cd front-end
+npm install
+npm start
+```
 
-## Building and Testing
-(Will be added as needed)
+To start the backend:
+```
+cd back-end
+npm install
+npm start
+```
